@@ -65,7 +65,8 @@ public class LoginInfo {
             return false;
         }
         LoginInfo loginInfo = (LoginInfo) obj;
-        return iconResourceId == loginInfo.iconResourceId &&
+        return id == loginInfo.id &&
+                iconResourceId == loginInfo.iconResourceId &&
                 Objects.equals(username, loginInfo.username) &&
                 Objects.equals(password, loginInfo.password);
     }

@@ -20,12 +20,12 @@ public class DatabaseRepository implements LoginInfoRepository {
 
     @Override
     public void update(LoginInfo loginInfo) {
-        databaseExecutor.execute(() -> dao.insert(loginInfo));
+        databaseExecutor.execute(() -> dao.update(loginInfo));
     }
 
     @Override
     public void delete(LoginInfo loginInfo) {
-        databaseExecutor.execute(() -> dao.insert(loginInfo));
+        databaseExecutor.execute(() -> dao.delete(loginInfo));
     }
 
     @Override
