@@ -2,6 +2,7 @@ package com.hafez.password_manager.models;
 
 import androidx.annotation.IdRes;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import java.util.Objects;
 
@@ -18,10 +19,16 @@ public class LoginInfo {
 
     private String password;
 
+    @Ignore
     public LoginInfo(String username, String password, int iconResourceId) {
         this.username = username;
         this.password = password;
         this.iconResourceId = iconResourceId;
+    }
+
+    public LoginInfo(long id, String username, String password, int iconResourceId) {
+        this(username, password, iconResourceId);
+        this.id = id;
     }
 
     public long getId() {

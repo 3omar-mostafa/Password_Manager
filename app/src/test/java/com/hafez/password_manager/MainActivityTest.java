@@ -48,9 +48,9 @@ public class MainActivityTest {
 
         loginInfoExpectedList = new ArrayList<>();
 
-        loginInfoExpectedList.add(new LoginInfo("user_1", "pass_1", R.drawable.ic_launcher));
-        loginInfoExpectedList.add(new LoginInfo("user_2", "pass_2", R.drawable.ic_launcher));
-        loginInfoExpectedList.add(new LoginInfo("user_2", "pass_3", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfo(1, "user_1", "pass_1", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfo(2, "user_2", "pass_2", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfo(3, "user_2", "pass_3", R.drawable.ic_launcher));
 
         MutableLiveData<List<LoginInfo>> liveData = new MutableLiveData<>();
         liveData.setValue(loginInfoExpectedList);

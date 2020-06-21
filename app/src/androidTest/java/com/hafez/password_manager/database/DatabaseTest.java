@@ -38,12 +38,11 @@ public class DatabaseTest {
                 AppDatabase.class).build();
         dao = database.getLoginInfoDao();
 
-        sampleData.add(new LoginInfo("u_1", "p_1", R.drawable.ic_launcher));
-        sampleData.add(new LoginInfo("u_2", "p_2", R.drawable.ic_launcher));
+        sampleData.add(new LoginInfo(1, "u_1", "p_1", R.drawable.ic_launcher));
+        sampleData.add(new LoginInfo(2, "u_2", "p_2", R.drawable.ic_launcher));
 
-        for (int i = 0; i < sampleData.size(); i++) {
-            sampleData.get(i).setId(i + 1);
-            dao.insert(sampleData.get(i));
+        for (LoginInfo loginInfo : sampleData) {
+            dao.insert(loginInfo);
         }
 
     }
