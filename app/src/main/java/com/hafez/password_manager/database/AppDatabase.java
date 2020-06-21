@@ -17,12 +17,14 @@ public abstract class AppDatabase extends RoomDatabase {
     public static AppDatabase getInstance() {
         if (instance == null) {
             synchronized (AppDatabase.class) {
-                instance = Room
-                        .databaseBuilder(App.getInstance(), AppDatabase.class, "login_info.db")
-                        .fallbackToDestructiveMigration()
-                        .setQueryExecutor(App.getInstance().getDatabaseExecutor())
-                        .setTransactionExecutor(App.getInstance().getDatabaseExecutor())
-                        .build();
+                if (instance == null) {
+                    instance = Room
+                            .databaseBuilder(App.getInstance(), AppDatabase.class, "login_info.db")
+                            .fallbackToDestructiveMigration()
+                            .setQueryExecutor(App.getInstance().getDatabaseExecutor())
+                            .setTransactionExecutor(App.getInstance().getDatabaseExecutor())
+                            .build();
+                }
             }
         }
 
