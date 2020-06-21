@@ -1,9 +1,15 @@
 package com.hafez.password_manager.models;
 
 import androidx.annotation.IdRes;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 import java.util.Objects;
 
+@Entity
 public class LoginInfo {
+
+    @PrimaryKey(autoGenerate = true)
+    private long id;
 
     @IdRes
     private int iconResourceId;
@@ -16,6 +22,14 @@ public class LoginInfo {
         this.username = username;
         this.password = password;
         this.iconResourceId = iconResourceId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public int getIconResourceId() {

@@ -6,5 +6,14 @@ import java.util.List;
 
 public interface LoginInfoRepository {
 
+    void insert(LoginInfo loginInfo);
+
+    void update(LoginInfo loginInfo);
+
+    void delete(LoginInfo loginInfo);
+
+    void deleteAllLoginInfo(LoginInfo loginInfo);
+
     LiveData<List<LoginInfo>> getAllLoginInfoList();
+
 }
