@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import com.hafez.password_manager.view_models.MainActivityViewModel;
@@ -77,24 +76,6 @@ public class MainActivityTest {
         viewModel.getLoginInfoLiveDataList().observeForever(observer);
 
         assertTrue(observer.isOnChangedCalled());
-
-    }
-
-    private abstract static class TestObserver implements Observer<List<LoginInfo>> {
-
-        private boolean isCalled = false;
-
-        public abstract void onChangedBehaviour(List<LoginInfo> loginInfoList);
-
-        @Override
-        public void onChanged(List<LoginInfo> loginInfoList) {
-            onChangedBehaviour(loginInfoList);
-            isCalled = true;
-        }
-
-        boolean isOnChangedCalled() {
-            return isCalled;
-        }
 
     }
 
