@@ -7,27 +7,15 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivityViewModel extends ViewModel {
 
-    private MutableLiveData<List<LoginInfo>> loginInfoList = new MutableLiveData<>();
+    private LiveData<List<LoginInfo>> loginInfoList = new MutableLiveData<>();
     private LoginInfoRepository repository;
 
     public MainActivityViewModel(LoginInfoRepository repository) {
         this.repository = repository;
-    }
-
-    public void setLoginInfoList(List<LoginInfo> loginInfoList) {
-        this.loginInfoList.setValue(loginInfoList);
-    }
-
-    public void addLoginInfo(LoginInfo loginInfo) {
-        if (loginInfoList.getValue() == null) {
-            loginInfoList.setValue(new ArrayList<>());
-        }
-        loginInfoList.getValue().add(loginInfo);
     }
 
     public LiveData<List<LoginInfo>> getLoginInfoLiveDataList() {
@@ -35,7 +23,7 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public void requestLoginInfoList() {
-        repository.getLoginInfoList(loginInfoList);
+        loginInfoList = repository.getAllLoginInfoList();
     }
 
 

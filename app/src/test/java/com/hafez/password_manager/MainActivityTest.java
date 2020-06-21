@@ -1,8 +1,7 @@
 package com.hafez.password_manager;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
@@ -42,20 +41,16 @@ public class MainActivityTest {
 
     public void setUpMockRepository() {
 
-        doAnswer(invocation -> {
-            MutableLiveData<List<LoginInfo>> liveData = invocation.getArgument(0);
+        loginInfoExpectedList = new ArrayList<>();
 
-            loginInfoExpectedList = new ArrayList<>();
+        loginInfoExpectedList.add(new LoginInfo("user_1", "pass_1", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfo("user_2", "pass_2", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfo("user_2", "pass_3", R.drawable.ic_launcher));
 
-            loginInfoExpectedList.add(new LoginInfo("user_1", "pass_1", R.drawable.ic_launcher));
-            loginInfoExpectedList.add(new LoginInfo("user_2", "pass_2", R.drawable.ic_launcher));
-            loginInfoExpectedList.add(new LoginInfo("user_2", "pass_3", R.drawable.ic_launcher));
+        MutableLiveData<List<LoginInfo>> liveData = new MutableLiveData<>();
+        liveData.setValue(loginInfoExpectedList);
 
-            liveData.setValue(loginInfoExpectedList);
-
-            return null;
-        }).when(repository).getLoginInfoList(any(MutableLiveData.class));
-
+        when(repository.getAllLoginInfoList()).thenReturn(liveData);
     }
 
     @Test
