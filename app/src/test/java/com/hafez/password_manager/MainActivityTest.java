@@ -1,6 +1,7 @@
 package com.hafez.password_manager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -11,6 +12,7 @@ import com.hafez.password_manager.repositories.LoginInfoRepository;
 import com.hafez.password_manager.view_models.MainActivityViewModel;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,11 +34,14 @@ public class MainActivityTest {
     private MainActivityViewModel viewModel;
 
     private List<LoginInfo> loginInfoExpectedList;
+    private TestObserver observer;
 
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
-        viewModel = new MainActivityViewModel(repository);
+        setUpMockRepository();
+        viewModel = new MainActivityViewModel.Factory(repository)
+                .create(MainActivityViewModel.class);
     }
 
     public void setUpMockRepository() {
@@ -53,22 +58,44 @@ public class MainActivityTest {
         when(repository.getAllLoginInfoList()).thenReturn(liveData);
     }
 
+    @After
+    public void cleanup() {
+        viewModel.getLoginInfoLiveDataList().removeObserver(observer);
+    }
+
+
     @Test
-    public void viewModelRepositoryTest() {
+    public void getLoginInfoLiveDataListTest() {
 
-        setUpMockRepository();
-
-        Observer<List<LoginInfo>> observer = new Observer<List<LoginInfo>>() {
+        observer = new TestObserver() {
             @Override
-            public void onChanged(List<LoginInfo> loginInfoList) {
+            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertEquals(loginInfoList, loginInfoExpectedList);
             }
         };
 
         viewModel.getLoginInfoLiveDataList().observeForever(observer);
 
-        viewModel.requestLoginInfoList();
+        assertTrue(observer.isOnChangedCalled());
 
-        viewModel.getLoginInfoLiveDataList().removeObserver(observer);
     }
+
+    private abstract static class TestObserver implements Observer<List<LoginInfo>> {
+
+        private boolean isCalled = false;
+
+        public abstract void onChangedBehaviour(List<LoginInfo> loginInfoList);
+
+        @Override
+        public void onChanged(List<LoginInfo> loginInfoList) {
+            onChangedBehaviour(loginInfoList);
+            isCalled = true;
+        }
+
+        boolean isOnChangedCalled() {
+            return isCalled;
+        }
+
+    }
+
 }
