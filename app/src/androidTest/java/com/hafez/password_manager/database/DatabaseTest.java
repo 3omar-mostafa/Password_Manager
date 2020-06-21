@@ -7,11 +7,11 @@ import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.hafez.password_manager.R;
+import com.hafez.password_manager.TestObserver;
 import com.hafez.password_manager.models.LoginInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,8 @@ public class DatabaseTest {
 
     private AppDatabase database;
     private LoginInfoDao dao;
+
+    private TestObserver observer;
 
     private List<LoginInfo> sampleData = new ArrayList<>();
 
@@ -49,6 +51,7 @@ public class DatabaseTest {
 
     @After
     public void closeDatabase() {
+        dao.getLoginInfoList().removeObserver(observer);
         database.close();
     }
 
@@ -57,15 +60,18 @@ public class DatabaseTest {
     public void getLoginInfoList() {
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
 
-        liveData.observeForever(new Observer<List<LoginInfo>>() {
+        observer = new TestObserver() {
             @Override
-            public void onChanged(List<LoginInfo> loginInfoList) {
+            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
                 assertFalse(loginInfoList.isEmpty());
                 assertEquals(loginInfoList, sampleData);
-                liveData.removeObserver(this);
             }
-        });
+        };
+
+        liveData.observeForever(observer);
+
+        assertTrue(observer.isOnChangedCalled());
     }
 
 
@@ -77,16 +83,20 @@ public class DatabaseTest {
         dao.insert(loginInfo);
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
-        liveData.observeForever(new Observer<List<LoginInfo>>() {
+
+        observer = new TestObserver() {
             @Override
-            public void onChanged(List<LoginInfo> loginInfoList) {
+            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
                 assertFalse(loginInfoList.isEmpty());
                 assertEquals(loginInfoList.size(), sampleData.size() + 1);
                 assertTrue(loginInfoList.contains(loginInfo));
-                liveData.removeObserver(this);
             }
-        });
+        };
+
+        liveData.observeForever(observer);
+
+        assertTrue(observer.isOnChangedCalled());
     }
 
 
@@ -101,19 +111,22 @@ public class DatabaseTest {
         dao.update(newData);
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
-        liveData.observeForever(new Observer<List<LoginInfo>>() {
+
+        observer = new TestObserver() {
             @Override
-            public void onChanged(List<LoginInfo> loginInfoList) {
+            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
                 assertFalse(loginInfoList.isEmpty());
                 assertEquals(loginInfoList.size(), sampleData.size());
 
                 LoginInfo loginInfo = loginInfoList.get(firstElement);
                 assertEquals(newData, loginInfo);
-
-                liveData.removeObserver(this);
             }
-        });
+        };
+
+        liveData.observeForever(observer);
+
+        assertTrue(observer.isOnChangedCalled());
     }
 
 
@@ -124,15 +137,19 @@ public class DatabaseTest {
         dao.delete(sampleData.get(firstElement));
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
-        liveData.observeForever(new Observer<List<LoginInfo>>() {
+
+        observer = new TestObserver() {
             @Override
-            public void onChanged(List<LoginInfo> loginInfoList) {
+            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
                 assertFalse(loginInfoList.isEmpty());
                 assertFalse(loginInfoList.contains(sampleData.get(firstElement)));
-                liveData.removeObserver(this);
             }
-        });
+        };
+
+        liveData.observeForever(observer);
+
+        assertTrue(observer.isOnChangedCalled());
     }
 
 
@@ -141,14 +158,18 @@ public class DatabaseTest {
         dao.deleteAllLoginInfo();
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
-        liveData.observeForever(new Observer<List<LoginInfo>>() {
+
+        observer = new TestObserver() {
             @Override
-            public void onChanged(List<LoginInfo> loginInfoList) {
+            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
                 assertTrue(loginInfoList.isEmpty());
-                liveData.removeObserver(this);
             }
-        });
+        };
+
+        liveData.observeForever(observer);
+
+        assertTrue(observer.isOnChangedCalled());
     }
 
 
