@@ -1,4 +1,4 @@
-package com.hafez.password_manager;
+package com.hafez.password_manager.view_models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import com.hafez.password_manager.R;
+import com.hafez.password_manager.TestObserver;
 import com.hafez.password_manager.mock.MockRepository;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
@@ -20,7 +22,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class MainActivityTest {
+public class MainActivityViewModelTest {
 
     @Rule
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
