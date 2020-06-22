@@ -15,7 +15,7 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder
     private static ItemCallback<LoginInfo> DIFF_CALLBACK = new ItemCallback<LoginInfo>() {
         @Override
         public boolean areItemsTheSame(@NonNull LoginInfo oldItem, @NonNull LoginInfo newItem) {
-            return oldItem == newItem;
+            return oldItem.getId() == newItem.getId();
         }
 
         @Override

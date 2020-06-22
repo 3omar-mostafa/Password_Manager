@@ -21,8 +21,6 @@ public abstract class AppDatabase extends RoomDatabase {
                     instance = Room
                             .databaseBuilder(App.getInstance(), AppDatabase.class, "login_info.db")
                             .fallbackToDestructiveMigration()
-                            .setQueryExecutor(App.getInstance().getDatabaseExecutor())
-                            .setTransactionExecutor(App.getInstance().getDatabaseExecutor())
                             .build();
                 }
             }

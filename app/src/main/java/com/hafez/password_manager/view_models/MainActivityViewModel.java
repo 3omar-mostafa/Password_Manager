@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.List;
 
@@ -45,6 +46,10 @@ public class MainActivityViewModel extends ViewModel {
 
         public Factory(LoginInfoRepository repository) {
             this.repository = repository;
+        }
+
+        public Factory() {
+            this(new DatabaseRepository());
         }
 
         @NonNull
