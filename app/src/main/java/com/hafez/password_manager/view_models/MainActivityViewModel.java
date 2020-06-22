@@ -13,7 +13,7 @@ public class MainActivityViewModel extends ViewModel {
     private LiveData<List<LoginInfo>> loginInfoList;
     private LoginInfoRepository repository;
 
-    public MainActivityViewModel(LoginInfoRepository repository) {
+    public MainActivityViewModel(@NonNull LoginInfoRepository repository) {
         this.repository = repository;
         this.loginInfoList = repository.getAllLoginInfoList();
     }
@@ -21,6 +21,23 @@ public class MainActivityViewModel extends ViewModel {
     public LiveData<List<LoginInfo>> getLoginInfoLiveDataList() {
         return loginInfoList;
     }
+
+    public void insertLoginInfo(LoginInfo loginInfo) {
+        repository.insert(loginInfo);
+    }
+
+    public void updateLoginInfo(LoginInfo newLoginInfo) {
+        repository.update(newLoginInfo);
+    }
+
+    public void deleteLoginInfo(LoginInfo loginInfo) {
+        repository.delete(loginInfo);
+    }
+
+    public void deleteAllLoginInfo() {
+        repository.deleteAllLoginInfo();
+    }
+
 
     public static class Factory implements ViewModelProvider.Factory {
 
