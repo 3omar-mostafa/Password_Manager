@@ -29,7 +29,7 @@ public class DatabaseRepository implements LoginInfoRepository {
     }
 
     @Override
-    public void deleteAllLoginInfo(LoginInfo loginInfo) {
+    public void deleteAllLoginInfo() {
         databaseExecutor.execute(() -> dao.deleteAllLoginInfo());
     }
 

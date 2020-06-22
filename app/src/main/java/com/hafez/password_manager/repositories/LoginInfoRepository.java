@@ -12,7 +12,7 @@ public interface LoginInfoRepository {
 
     void delete(LoginInfo loginInfo);
 
-    void deleteAllLoginInfo(LoginInfo loginInfo);
+    void deleteAllLoginInfo();
 
     LiveData<List<LoginInfo>> getAllLoginInfoList();
 
