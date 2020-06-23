@@ -11,7 +11,6 @@ import com.hafez.password_manager.TestObserver;
 import com.hafez.password_manager.mock.MockRepository;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
-import com.hafez.password_manager.view_models.MainActivityViewModel;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -22,12 +21,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public class MainActivityViewModelTest {
+public class LoginInfoViewModelTest {
 
     @Rule
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
 
-    private MainActivityViewModel viewModel;
+    private LoginInfoViewModel viewModel;
 
     private List<LoginInfo> loginInfoExpectedList;
     private TestObserver observer;
@@ -36,8 +35,7 @@ public class MainActivityViewModelTest {
     public void init() {
         LoginInfoRepository repository = setUpMockRepository();
 
-        viewModel = new MainActivityViewModel.Factory(repository)
-                .create(MainActivityViewModel.class);
+        viewModel = new LoginInfoViewModel.Factory(repository).create(LoginInfoViewModel.class);
     }
 
     public LoginInfoRepository setUpMockRepository() {

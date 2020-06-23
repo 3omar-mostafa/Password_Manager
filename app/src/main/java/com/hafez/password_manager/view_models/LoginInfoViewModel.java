@@ -9,12 +9,12 @@ import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.List;
 
-public class MainActivityViewModel extends ViewModel {
+public class LoginInfoViewModel extends ViewModel {
 
     private LiveData<List<LoginInfo>> loginInfoList;
     private LoginInfoRepository repository;
 
-    public MainActivityViewModel(@NonNull LoginInfoRepository repository) {
+    public LoginInfoViewModel(@NonNull LoginInfoRepository repository) {
         this.repository = repository;
         this.loginInfoList = repository.getAllLoginInfoList();
     }
@@ -56,7 +56,7 @@ public class MainActivityViewModel extends ViewModel {
         @Override
         @SuppressWarnings("unchecked")
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-            return (T) new MainActivityViewModel(repository);
+            return (T) new LoginInfoViewModel(repository);
         }
     }
 

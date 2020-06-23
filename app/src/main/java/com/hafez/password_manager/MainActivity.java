@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hafez.password_manager.databinding.ActivityMainBinding;
-import com.hafez.password_manager.view_models.MainActivityViewModel;
+import com.hafez.password_manager.view_models.LoginInfoViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,8 +19,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(viewBinding.getRoot());
 
-        MainActivityViewModel viewModel = new ViewModelProvider(this,
-                new MainActivityViewModel.Factory()).get(MainActivityViewModel.class);
+        LoginInfoViewModel viewModel = new ViewModelProvider(this,
+                new LoginInfoViewModel.Factory()).get(LoginInfoViewModel.class);
 
         LoginInfoAdapter adapter = new LoginInfoAdapter();
         viewBinding.loginInfoRecyclerView.setAdapter(adapter);
