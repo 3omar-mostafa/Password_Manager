@@ -1,4 +1,9 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="icon_size">48dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="divider">1dp</dimen>
+    <dimen name="copy_icon">32dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
 </resources>
