@@ -74,55 +74,6 @@ public class LoginInfoViewModelTest {
     }
 
     @Test
-    public void insertLoginInfoTest() {
-        LoginInfo newData = new LoginInfo("new_user", "new_pass", 0);
-        newData.setId(loginInfoExpectedList.size() + 1);
-
-        viewModel.insertLoginInfo(newData);
-
-        observer = new TestObserver() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertNotNull(loginInfoList);
-                assertFalse(loginInfoList.isEmpty());
-                assertEquals(loginInfoList.size(), loginInfoExpectedList.size() + 1);
-                assertTrue(loginInfoList.contains(newData));
-            }
-        };
-
-        viewModel.getLoginInfoLiveDataList().observeForever(observer);
-
-        assertTrue(observer.isOnChangedCalled());
-    }
-
-    @Test
-    public void updateLoginInfoTest() {
-        int firstElement = 0;
-
-        LoginInfo updatedData = loginInfoExpectedList.get(firstElement);
-        updatedData.setUsername("new_name");
-        updatedData.setPassword("new_password");
-
-        viewModel.updateLoginInfo(updatedData);
-
-        observer = new TestObserver() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertNotNull(loginInfoList);
-                assertFalse(loginInfoList.isEmpty());
-                assertEquals(loginInfoList.size(), loginInfoExpectedList.size());
-
-                LoginInfo loginInfo = loginInfoList.get(firstElement);
-                assertEquals(updatedData, loginInfo);
-            }
-        };
-
-        viewModel.getLoginInfoLiveDataList().observeForever(observer);
-
-        assertTrue(observer.isOnChangedCalled());
-    }
-
-    @Test
     public void deleteLoginInfoTest() {
         int firstElement = 0;
 

@@ -23,14 +23,6 @@ public class LoginInfoViewModel extends ViewModel {
         return loginInfoList;
     }
 
-    public void insertLoginInfo(LoginInfo loginInfo) {
-        repository.insert(loginInfo);
-    }
-
-    public void updateLoginInfo(LoginInfo newLoginInfo) {
-        repository.update(newLoginInfo);
-    }
-
     public void deleteLoginInfo(LoginInfo loginInfo) {
         repository.delete(loginInfo);
     }
