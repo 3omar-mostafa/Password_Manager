@@ -38,4 +38,9 @@ public class DatabaseRepository implements LoginInfoRepository {
         return dao.getLoginInfoList();
     }
 
+    @Override
+    public LiveData<LoginInfo> getLoginInfo(long id) {
+        return dao.getLoginInfo(id);
+    }
+
 }

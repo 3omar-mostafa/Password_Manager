@@ -16,4 +16,5 @@ public interface LoginInfoRepository {
 
     LiveData<List<LoginInfo>> getAllLoginInfoList();
 
+    LiveData<LoginInfo> getLoginInfo(long id);
 }

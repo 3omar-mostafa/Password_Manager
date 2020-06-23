@@ -28,4 +28,7 @@ public interface LoginInfoDao {
     @Query("SELECT * FROM LoginInfo")
     LiveData<List<LoginInfo>> getLoginInfoList();
 
+    @Query("SELECT * FROM LoginInfo WHERE id = :id")
+    LiveData<LoginInfo> getLoginInfo(long id);
+
 }

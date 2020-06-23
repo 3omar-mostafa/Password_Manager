@@ -54,4 +54,17 @@ public class MockRepository implements LoginInfoRepository {
     public LiveData<List<LoginInfo>> getAllLoginInfoList() {
         return database;
     }
+
+    @Override
+    public LiveData<LoginInfo> getLoginInfo(long id) {
+        MutableLiveData<LoginInfo> loginInfoLiveData = new MutableLiveData<>();
+
+        for (LoginInfo loginInfo : database.getValue()) {
+            if (loginInfo.getId() == id) {
+                loginInfoLiveData.setValue(loginInfo);
+                break;
+            }
+        }
+        return loginInfoLiveData;
+    }
 }
