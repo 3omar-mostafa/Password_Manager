@@ -84,6 +84,7 @@ public class LoginInfoViewModelTest {
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
                 assertFalse(loginInfoList.isEmpty());
+                assertEquals(loginInfoExpectedList.size() - 1, loginInfoList.size());
                 assertFalse(loginInfoList.contains(loginInfoExpectedList.get(firstElement)));
             }
         };
