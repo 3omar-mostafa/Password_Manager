@@ -9,8 +9,10 @@ import java.util.Objects;
 @Entity
 public class LoginInfo {
 
+    public static final long INVALID_ID = -1;
+
     @PrimaryKey(autoGenerate = true)
-    private long id;
+    private long id = INVALID_ID;
 
     @IdRes
     private int iconResourceId;

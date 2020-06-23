@@ -13,7 +13,7 @@ public class AddEditLoginInfoViewModel extends ViewModel {
 
     private LiveData<LoginInfo> loginInfo;
     private LoginInfoRepository repository;
-    private Long loginInfoId;
+    private long loginInfoId;
 
     /**
      * Used when updating existing {@link LoginInfo}
@@ -31,7 +31,7 @@ public class AddEditLoginInfoViewModel extends ViewModel {
      */
     public AddEditLoginInfoViewModel(@NonNull LoginInfoRepository repository) {
         this.repository = repository;
-        this.loginInfoId = null;
+        this.loginInfoId = LoginInfo.INVALID_ID;
         this.loginInfo = null;
     }
 
@@ -44,7 +44,7 @@ public class AddEditLoginInfoViewModel extends ViewModel {
      * @param newLoginInfo New {@link LoginInfo} object to be inserted or updated
      */
     public void insertOrUpdateLoginInfo(@NonNull LoginInfo newLoginInfo) {
-        if (loginInfoId == null) {
+        if (loginInfoId == LoginInfo.INVALID_ID) {
             repository.insert(newLoginInfo);
         } else {
             newLoginInfo.setId(loginInfoId);
@@ -68,12 +68,14 @@ public class AddEditLoginInfoViewModel extends ViewModel {
     public static class Factory implements ViewModelProvider.Factory {
 
         private LoginInfoRepository repository;
-        private Long loginInfoId;
+        private long loginInfoId;
 
         /**
-         * Used when updating existing {@link LoginInfo}
+         * Used when updating existing {@link LoginInfo}, Or when creating a new {@link LoginInfo}
+         * by passing {@link LoginInfo#INVALID_ID} id
          *
-         * @param loginInfoId The id of the existing {@link LoginInfo} object
+         * @param loginInfoId The id of the existing {@link LoginInfo} object, Or {@link
+         *                    LoginInfo#INVALID_ID} to create new {@link LoginInfo} object.
          */
         public Factory(LoginInfoRepository repository, long loginInfoId) {
             this.repository = repository;
@@ -84,8 +86,7 @@ public class AddEditLoginInfoViewModel extends ViewModel {
          * Used when creating a new {@link LoginInfo}
          */
         public Factory(LoginInfoRepository repository) {
-            this.repository = repository;
-            this.loginInfoId = null;
+            this(repository, LoginInfo.INVALID_ID);
         }
 
         /**
@@ -110,7 +111,7 @@ public class AddEditLoginInfoViewModel extends ViewModel {
         @SuppressWarnings("unchecked")
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
 
-            if (loginInfoId == null) {
+            if (loginInfoId == LoginInfo.INVALID_ID) {
                 return (T) new AddEditLoginInfoViewModel(repository);
             } else {
                 return (T) new AddEditLoginInfoViewModel(repository, loginInfoId);
