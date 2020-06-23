@@ -29,7 +29,7 @@ public class LoginInfoViewModelTest {
     private LoginInfoViewModel viewModel;
 
     private List<LoginInfo> loginInfoExpectedList;
-    private TestObserver observer;
+    private TestObserver<List<LoginInfo>> observer;
 
     @Before
     public void init() {
@@ -58,7 +58,7 @@ public class LoginInfoViewModelTest {
     @Test
     public void getLoginInfoLiveDataListTest() {
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
@@ -79,7 +79,7 @@ public class LoginInfoViewModelTest {
 
         viewModel.deleteLoginInfo(loginInfoExpectedList.get(firstElement));
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
@@ -97,7 +97,7 @@ public class LoginInfoViewModelTest {
     public void deleteAllLoginInfoTest() {
         viewModel.deleteAllLoginInfo();
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);

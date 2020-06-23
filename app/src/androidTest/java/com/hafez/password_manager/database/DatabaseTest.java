@@ -30,7 +30,7 @@ public class DatabaseTest {
     private AppDatabase database;
     private LoginInfoDao dao;
 
-    private TestObserver observer;
+    private TestObserver<List<LoginInfo>> observer;
 
     private List<LoginInfo> sampleData = new ArrayList<>();
 
@@ -60,7 +60,7 @@ public class DatabaseTest {
     public void getLoginInfoList() {
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
@@ -84,7 +84,7 @@ public class DatabaseTest {
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
@@ -112,7 +112,7 @@ public class DatabaseTest {
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
@@ -138,7 +138,7 @@ public class DatabaseTest {
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);
@@ -159,7 +159,7 @@ public class DatabaseTest {
 
         LiveData<List<LoginInfo>> liveData = dao.getLoginInfoList();
 
-        observer = new TestObserver() {
+        observer = new TestObserver<List<LoginInfo>>() {
             @Override
             public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
                 assertNotNull(loginInfoList);

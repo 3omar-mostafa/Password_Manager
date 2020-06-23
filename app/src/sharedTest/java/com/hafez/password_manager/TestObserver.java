@@ -1,18 +1,16 @@
 package com.hafez.password_manager;
 
 import androidx.lifecycle.Observer;
-import com.hafez.password_manager.models.LoginInfo;
-import java.util.List;
 
-public abstract class TestObserver implements Observer<List<LoginInfo>> {
+public abstract class TestObserver<T> implements Observer<T> {
 
     private boolean isCalled = false;
 
-    public abstract void onChangedBehaviour(List<LoginInfo> loginInfoList);
+    public abstract void onChangedBehaviour(T t);
 
     @Override
-    public void onChanged(List<LoginInfo> loginInfoList) {
-        onChangedBehaviour(loginInfoList);
+    public void onChanged(T t) {
+        onChangedBehaviour(t);
         isCalled = true;
     }
 
