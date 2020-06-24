@@ -3,4 +3,5 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="add_login_info">Add Login Information</string>
+    <string name="error_text">This Field Is Required</string>
 </resources>

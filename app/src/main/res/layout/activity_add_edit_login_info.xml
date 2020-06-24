@@ -26,17 +26,15 @@
                     android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/username_text_input_layout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/username_edit_text"
+                            android:id="@+id/username"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="5"
+                            android:layout_height="wrap_content"
                             android:hint="@string/username"
                             android:singleLine="true"/>
 
@@ -65,7 +63,6 @@
                     android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/password_text_input_layout"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -73,10 +70,9 @@
                         app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/password_edit_text"
+                            android:id="@+id/password"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="5"
+                            android:layout_height="wrap_content"
                             android:hint="@string/password"
                             android:inputType="textPassword"
                             android:singleLine="true"/>
@@ -102,6 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
+            app:useCompatPadding="true"
             android:layout_margin="@dimen/fab_margin"
             app:srcCompat="@drawable/action_save"/>
 
