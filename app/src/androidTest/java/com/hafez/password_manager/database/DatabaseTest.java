@@ -80,7 +80,6 @@ public class DatabaseTest {
     @Test
     public void insertTest() {
         LoginInfo loginInfo = new LoginInfo("user_1", "pass_1", R.drawable.ic_launcher);
-        loginInfo.setId(sampleData.size() + 1);
 
         dao.insert(loginInfo);
 
@@ -92,6 +91,7 @@ public class DatabaseTest {
                 assertNotNull(loginInfoList);
                 assertFalse(loginInfoList.isEmpty());
                 assertEquals(loginInfoList.size(), sampleData.size() + 1);
+                loginInfo.setId(sampleData.size() + 1);
                 assertTrue(loginInfoList.contains(loginInfo));
             }
         };

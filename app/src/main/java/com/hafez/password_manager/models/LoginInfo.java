@@ -9,7 +9,7 @@ import java.util.Objects;
 @Entity
 public class LoginInfo {
 
-    public static final long INVALID_ID = -1;
+    public static final long INVALID_ID = 0;
 
     @PrimaryKey(autoGenerate = true)
     private long id = INVALID_ID;
