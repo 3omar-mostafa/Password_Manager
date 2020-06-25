@@ -9,8 +9,6 @@ import static org.junit.Assert.assertTrue;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.room.OnConflictStrategy;
-import androidx.room.Room;
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.hafez.password_manager.R;
 import com.hafez.password_manager.TestObserver;
@@ -38,8 +36,7 @@ public class DatabaseTest {
 
     @Before
     public void initDatabase() {
-        database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(),
-                AppDatabase.class).build();
+        database = DatabaseTestUtils.getInMemoryDatabase();
         dao = database.getLoginInfoDao();
 
         sampleData.add(new LoginInfo(1, "u_1", "p_1", R.drawable.ic_launcher));
