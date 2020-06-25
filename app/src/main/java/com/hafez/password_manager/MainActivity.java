@@ -2,8 +2,6 @@ package com.hafez.password_manager;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,12 +27,15 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getLoginInfoLiveDataList()
                 .observe(this, loginInfoList -> adapter.submitList(loginInfoList));
 
-        viewBinding.add.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddEditLoginInfoActivity.class);
-                startActivity(intent);
-            }
+        adapter.setOnItemClickListener((view, loginInfo) -> {
+            Intent intent = new Intent(MainActivity.this, AddEditLoginInfoActivity.class);
+            intent.putExtra(AddEditLoginInfoActivity.ARGUMENT_LOGIN_INFO_ID, loginInfo.getId());
+            startActivity(intent);
+        });
+
+        viewBinding.add.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, AddEditLoginInfoActivity.class);
+            startActivity(intent);
         });
 
     }

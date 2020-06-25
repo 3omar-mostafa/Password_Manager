@@ -1,6 +1,7 @@
 package com.hafez.password_manager;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil.ItemCallback;
@@ -24,8 +25,11 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder
         }
     };
 
+    private OnItemClickListener onItemClickListener;
+
     public LoginInfoAdapter() {
         super(DIFF_CALLBACK);
+        onItemClickListener = null;
     }
 
     @NonNull
@@ -45,14 +49,24 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder
         holder.bind(loginInfo);
     }
 
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
-    static class LoginInfoViewHolder extends ViewHolder {
+    class LoginInfoViewHolder extends ViewHolder {
 
         private LoginInfoListItemBinding viewBinding;
 
         LoginInfoViewHolder(@NonNull LoginInfoListItemBinding viewBinding) {
             super(viewBinding.getRoot());
             this.viewBinding = viewBinding;
+
+            viewBinding.getRoot().setOnClickListener(v -> {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClick(v, getItem(getLayoutPosition()));
+                }
+            });
+
         }
 
         void bind(@NonNull LoginInfo loginInfo) {
@@ -62,4 +76,10 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder
         }
 
     }
+
+    public interface OnItemClickListener {
+
+        void onItemClick(View view, @NonNull LoginInfo loginInfo);
+    }
+
 }
