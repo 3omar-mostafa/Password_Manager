@@ -7,6 +7,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -17,8 +18,13 @@ import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 
 public class AddEditLoginInfoActivity extends AppCompatActivity {
 
+    public static final String ARGUMENT_LOGIN_INFO_ID = "id";
+
     protected AddEditLoginInfoViewModel viewModel;
     protected ActivityAddEditLoginInfoBinding viewBinding;
+
+    enum Modes {ADD, EDIT}
+    private Modes mode = Modes.ADD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +34,33 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
 
         setContentView(viewBinding.getRoot());
 
-        viewModel = new ViewModelProvider(this, new AddEditLoginInfoViewModel.Factory())
+        long id = getIntent().getLongExtra(ARGUMENT_LOGIN_INFO_ID, LoginInfo.INVALID_ID);
+        if (id != LoginInfo.INVALID_ID) {
+            mode = Modes.EDIT;
+        }
+
+        viewModel = new ViewModelProvider(this, new AddEditLoginInfoViewModel.Factory(id))
                 .get(AddEditLoginInfoViewModel.class);
+
+        LiveData<LoginInfo> loginInfoData = viewModel.getLoginInfo();
+
+        if (mode == Modes.EDIT) {
+            setTitle(R.string.edit_login_info);
+            if (loginInfoData != null) {
+                loginInfoData.observe(this, loginInfo -> bindViewsWithData(loginInfo));
+            }
+        }
 
         initializeViews();
 
+    }
+
+    protected void bindViewsWithData(@NonNull LoginInfo loginInfo) {
+        viewBinding.username.setText(loginInfo.getUsername());
+        viewBinding.password.setText(loginInfo.getPassword());
+
+        viewBinding.username.clearFocus();
+        viewBinding.password.clearFocus();
     }
 
     protected void initializeViews() {

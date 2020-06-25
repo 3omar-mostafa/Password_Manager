@@ -3,6 +3,7 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="add_login_info">Add Login Information</string>
+    <string name="edit_login_info">Edit Login Information</string>
     <string name="error_text">This Field Is Required</string>
     <string name="error_save_validation">Please Enter All Required Fields</string>
 </resources>
