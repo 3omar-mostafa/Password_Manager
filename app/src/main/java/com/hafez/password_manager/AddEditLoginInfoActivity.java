@@ -17,8 +17,8 @@ import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 
 public class AddEditLoginInfoActivity extends AppCompatActivity {
 
-    private AddEditLoginInfoViewModel viewModel;
-    private ActivityAddEditLoginInfoBinding viewBinding;
+    protected AddEditLoginInfoViewModel viewModel;
+    protected ActivityAddEditLoginInfoBinding viewBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
 
     }
 
-    private void initializeViews() {
+    protected void initializeViews() {
         OnFocusChangeListener focusChangeListener = (view, hasFocus) -> {
             if (!hasFocus) {
                 EditText editText = (EditText) view;
@@ -59,11 +59,11 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
 
     }
 
-    private boolean isInputValid() {
+    protected boolean isInputValid() {
         return isValidTextInput(viewBinding.username) && isValidTextInput(viewBinding.password);
     }
 
-    private void showSavingErrors() {
+    protected void showSavingErrors() {
         Snackbar.make(viewBinding.save, R.string.error_save_validation, Snackbar.LENGTH_SHORT)
                 .setAnchorView(viewBinding.save)
                 .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
@@ -73,11 +73,11 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         ifInvalidShowErrorElseRemoveError(viewBinding.password);
     }
 
-    private void ifInvalidShowErrorElseRemoveError(@NonNull EditText editText) {
+    protected void ifInvalidShowErrorElseRemoveError(@NonNull EditText editText) {
         ifInvalidShowErrorElseRemoveError(editText, isValidTextInput(editText));
     }
 
-    private void ifInvalidShowErrorElseRemoveError(@NonNull EditText editText, boolean isValid) {
+    protected void ifInvalidShowErrorElseRemoveError(@NonNull EditText editText, boolean isValid) {
         if (isValid) {
             clearErrorMessage(editText);
         } else {
@@ -85,7 +85,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         }
     }
 
-    private void saveLoginInfo() {
+    protected void saveLoginInfo() {
         String username = viewBinding.username.getText().toString();
         String password = viewBinding.password.getText().toString();
 
@@ -93,37 +93,37 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         viewModel.insertOrUpdateLoginInfo(loginInfo);
     }
 
-    private boolean isValidTextInput(@NonNull EditText editText) {
+    protected boolean isValidTextInput(@NonNull EditText editText) {
         return editText.getText() != null && !editText.getText().toString().trim().isEmpty();
     }
 
-    private void showErrorMessage(@NonNull EditText editText) {
+    protected void showErrorMessage(@NonNull EditText editText) {
         showErrorMessage(editText, R.string.error_text);
     }
 
-    private void showErrorMessage(@NonNull EditText editText, @StringRes int errorMessageResId) {
+    protected void showErrorMessage(@NonNull EditText editText, @StringRes int errorMessageResId) {
         showErrorMessage(editText, getString(errorMessageResId));
     }
 
-    private void showErrorMessage(@NonNull EditText editText, String errorMessage) {
+    protected void showErrorMessage(@NonNull EditText editText, String errorMessage) {
         TextInputLayout inputLayout = getParentTextInputLayout(editText);
         inputLayout.setError(errorMessage);
     }
 
-    private void clearErrorMessage(@NonNull EditText editText) {
+    protected void clearErrorMessage(@NonNull EditText editText) {
         TextInputLayout inputLayout = getParentTextInputLayout(editText);
         inputLayout.setError(null);
     }
 
 
-    private TextInputLayout getParentTextInputLayout(@NonNull EditText editText) {
+    protected TextInputLayout getParentTextInputLayout(@NonNull EditText editText)
+            throws IllegalStateException {
         TextInputLayout inputLayout;
 
-        ViewParent parent = editText.getParent();
+        // Uses parent of parent because TextInputLayout puts a FrameLayout as a direct child by default
+        ViewParent parent = editText.getParent().getParent();
         if (parent instanceof TextInputLayout) {
             inputLayout = (TextInputLayout) parent;
-        } else if (parent.getParent() instanceof TextInputLayout) {
-            inputLayout = (TextInputLayout) parent.getParent();
         } else {
             throw new IllegalStateException("Parent View Must be TextInputLayout");
         }

@@ -10,8 +10,17 @@ import java.util.concurrent.Executor;
 
 public class DatabaseRepository implements LoginInfoRepository {
 
-    private Executor databaseExecutor = App.getInstance().getDatabaseExecutor();
-    private LoginInfoDao dao = AppDatabase.getInstance().getLoginInfoDao();
+    private Executor databaseExecutor;
+    private LoginInfoDao dao;
+
+    public DatabaseRepository() {
+        this(AppDatabase.getInstance().getLoginInfoDao());
+    }
+
+    public DatabaseRepository(LoginInfoDao dao) {
+        this.databaseExecutor = App.getInstance().getDatabaseExecutor();
+        this.dao = dao;
+    }
 
     @Override
     public void insert(LoginInfo loginInfo) {
