@@ -3,13 +3,13 @@ package com.hafez.password_manager;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -20,7 +20,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
@@ -106,11 +105,7 @@ public class AddLoginInfoActivityTest {
         onView(withChild(withChild(withId(R.id.username)))).check(hasNoErrorMessage);
         onView(withChild(withChild(withId(R.id.password)))).check(hasNoErrorMessage);
 
-        // Checks that snackbar is not shown
-        assertThrows(NoMatchingViewException.class, () -> {
-            onView(withId(com.google.android.material.R.id.snackbar_text))
-                    .check(matches(isDisplayed()));
-        });
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(doesNotExist());
 
         TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
             @Override
