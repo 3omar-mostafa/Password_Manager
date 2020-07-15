@@ -9,15 +9,18 @@ import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
@@ -52,6 +55,12 @@ public class AddLoginInfoActivityTest {
                 @Override
                 protected AddEditLoginInfoViewModel getViewModel(Factory factory) {
                     return getViewModelWithInMemoryDatabase();
+                }
+
+                @Override
+                public void finish() {
+                    // Delay finish to have time to make some checks on activity
+                    new Handler().postDelayed(super::finish, 1000);
                 }
             };
         }
@@ -90,6 +99,17 @@ public class AddLoginInfoActivityTest {
         onView(withId(R.id.username)).perform(typeText(sampleUsername));
         onView(withId(R.id.password)).perform(typeText(samplePassword));
         onView(withId(R.id.save)).perform(click());
+
+        ViewAssertion hasNoErrorMessage = matches(CustomViewMatchers.hasErrorText(null));
+
+        onView(withChild(withChild(withId(R.id.username)))).check(hasNoErrorMessage);
+        onView(withChild(withChild(withId(R.id.password)))).check(hasNoErrorMessage);
+
+        // Checks that snackbar is not shown
+        assertThrows(NoMatchingViewException.class, () -> {
+            onView(withId(com.google.android.material.R.id.snackbar_text))
+                    .check(matches(isDisplayed()));
+        });
 
         TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
             @Override
