@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DatabaseTestUtils {
 
-    public static void assertThatDatabaseIsEmpty(LoginInfoRepository repository) {
+    public static void assertThatLoginInfoTableIsEmpty(LoginInfoRepository repository) {
 
         TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
             @Override

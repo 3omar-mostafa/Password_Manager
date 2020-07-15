@@ -132,7 +132,7 @@ public class AddLoginInfoActivityTest {
 
     @Test
     public void failedInsertionInvalidInputTest() throws InterruptedException {
-        DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(withId(R.id.save)).perform(click());
 
@@ -150,13 +150,13 @@ public class AddLoginInfoActivityTest {
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
-        DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
     }
 
 
     @Test
     public void failedInsertionInvalidUsernameTest() throws InterruptedException {
-        DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(withId(R.id.password)).perform(typeText("password"));
         onView(withId(R.id.save)).perform(click());
@@ -176,13 +176,13 @@ public class AddLoginInfoActivityTest {
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
-        DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
     }
 
 
     @Test
     public void failedInsertionInvalidPasswordTest() throws InterruptedException {
-        DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(withId(R.id.username)).perform(typeText("username"));
         onView(withId(R.id.save)).perform(click());
@@ -202,7 +202,7 @@ public class AddLoginInfoActivityTest {
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
-        DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
     }
 
 
