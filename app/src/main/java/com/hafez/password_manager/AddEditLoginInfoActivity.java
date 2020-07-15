@@ -105,7 +105,8 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         ifInvalidShowErrorElseRemoveError(editText, isValidTextInput(editText));
     }
 
-    protected void ifInvalidShowErrorElseRemoveError(@NonNull EditText editText, boolean isValid) {
+    protected static void ifInvalidShowErrorElseRemoveError(@NonNull EditText editText,
+            boolean isValid) {
         if (isValid) {
             clearErrorMessage(editText);
         } else {
@@ -121,30 +122,31 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         viewModel.insertOrUpdateLoginInfo(loginInfo);
     }
 
-    protected boolean isValidTextInput(@NonNull EditText editText) {
+    protected static boolean isValidTextInput(@NonNull EditText editText) {
         return editText.getText() != null && !editText.getText().toString().trim().isEmpty();
     }
 
-    protected void showErrorMessage(@NonNull EditText editText) {
+    protected static void showErrorMessage(@NonNull EditText editText) {
         showErrorMessage(editText, R.string.error_text);
     }
 
-    protected void showErrorMessage(@NonNull EditText editText, @StringRes int errorMessageResId) {
-        showErrorMessage(editText, getString(errorMessageResId));
+    protected static void showErrorMessage(@NonNull EditText editText,
+            @StringRes int errorMessageResId) {
+        showErrorMessage(editText, App.getInstance().getString(errorMessageResId));
     }
 
-    protected void showErrorMessage(@NonNull EditText editText, String errorMessage) {
+    protected static void showErrorMessage(@NonNull EditText editText, String errorMessage) {
         TextInputLayout inputLayout = getParentTextInputLayout(editText);
         inputLayout.setError(errorMessage);
     }
 
-    protected void clearErrorMessage(@NonNull EditText editText) {
+    protected static void clearErrorMessage(@NonNull EditText editText) {
         TextInputLayout inputLayout = getParentTextInputLayout(editText);
         inputLayout.setError(null);
     }
 
 
-    protected TextInputLayout getParentTextInputLayout(@NonNull EditText editText)
+    protected static TextInputLayout getParentTextInputLayout(@NonNull EditText editText)
             throws IllegalStateException {
         TextInputLayout inputLayout;
 

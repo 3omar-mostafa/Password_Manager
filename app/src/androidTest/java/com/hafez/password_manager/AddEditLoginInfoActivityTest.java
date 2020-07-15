@@ -1,28 +1,17 @@
 package com.hafez.password_manager;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.withChild;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import androidx.annotation.NonNull;
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import com.google.android.material.textfield.TextInputLayout;
-import com.hafez.password_manager.Utils.CustomViewMatchers;
-import com.hafez.password_manager.database.DatabaseTestUtils;
-import com.hafez.password_manager.database.LoginInfoDao;
-import com.hafez.password_manager.repositories.DatabaseRepository;
-import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -32,54 +21,41 @@ import org.junit.Test;
  */
 public class AddEditLoginInfoActivityTest {
 
-    @Rule
-    public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
-
-    @Rule
-    public ActivityScenarioRule<AddEditLoginInfoActivity> activityScenarioRule =
-            new ActivityScenarioRule<>(AddEditLoginInfoActivity.class);
-
-    private ActivityScenario<AddEditLoginInfoActivity> activityScenario;
     private Context context;
-
+    private TextInputLayout inputLayout;
+    private EditText editText;
 
     @Before
     public void init() {
         context = ApplicationProvider.getApplicationContext();
 
-        activityScenario = activityScenarioRule.getScenario().onActivity(activity -> {
-            activity.viewModel = getViewModelWithInMemoryDatabase();
-        });
-    }
+        context.setTheme(R.style.AppTheme);
 
-    @NonNull
-    private AddEditLoginInfoViewModel getViewModelWithInMemoryDatabase() {
-        LoginInfoDao dao = DatabaseTestUtils.getInMemoryDatabase().getLoginInfoDao();
-        return new AddEditLoginInfoViewModel(new DatabaseRepository(dao));
+        inputLayout = new TextInputLayout(context);
+        editText = new EditText(context);
+        inputLayout.addView(editText);
+
     }
 
     @Test
     public void showErrorMessageTest1() {
-        activityScenario.onActivity(activity -> {
-            activity.showErrorMessage(activity.viewBinding.username);
-        });
+        AddEditLoginInfoActivity.showErrorMessage(editText);
 
         String errorText = context.getString(R.string.error_text);
-        onView(withChild(withChild(withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasErrorText(errorText)));
+
+        assertNotNull(inputLayout.getError());
+        assertEquals(errorText, inputLayout.getError());
     }
 
     @Test
     public void showErrorMessageTest2() {
         int errorTextResId = R.string.error_save_validation;
-
-        activityScenario.onActivity(activity -> {
-            activity.showErrorMessage(activity.viewBinding.username, errorTextResId);
-        });
-
         String errorText = context.getString(errorTextResId);
-        onView(withChild(withChild(withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasErrorText(errorText)));
+
+        AddEditLoginInfoActivity.showErrorMessage(editText, errorTextResId);
+
+        assertNotNull(inputLayout.getError());
+        assertEquals(errorText, inputLayout.getError());
     }
 
 
@@ -87,12 +63,10 @@ public class AddEditLoginInfoActivityTest {
     public void showErrorMessageTest3() {
         String errorText = "new error message";
 
-        activityScenario.onActivity(activity -> {
-            activity.showErrorMessage(activity.viewBinding.username, errorText);
-        });
+        AddEditLoginInfoActivity.showErrorMessage(editText, errorText);
 
-        onView(withChild(withChild(withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasErrorText(errorText)));
+        assertNotNull(inputLayout.getError());
+        assertEquals(errorText, inputLayout.getError());
     }
 
 
@@ -100,65 +74,47 @@ public class AddEditLoginInfoActivityTest {
     public void clearErrorMessageTest() {
         showErrorMessageTest3();
 
-        activityScenario.onActivity(activity -> {
-            activity.clearErrorMessage(activity.viewBinding.username);
-        });
+        AddEditLoginInfoActivity.clearErrorMessage(editText);
 
-        onView(withChild(withChild(withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasErrorText(null)));
+        assertNull(inputLayout.getError());
     }
 
 
     @Test
     public void getParentTextInputLayoutSuccessfulTest() {
-
-        activityScenario.onActivity(activity -> {
-
-            TextInputLayout inputLayout = new TextInputLayout(activity);
-            EditText editText = new EditText(activity);
-            inputLayout.addView(editText);
-
-            activity.getParentTextInputLayout(editText);
-        });
+        AddEditLoginInfoActivity.getParentTextInputLayout(editText);
     }
 
     @Test(expected = NullPointerException.class)
     public void getParentTextInputLayoutNoParentTest() {
-
-        final AddEditLoginInfoActivity[] activityArray = new AddEditLoginInfoActivity[1];
-
-        activityScenario.onActivity(activity -> activityArray[0] = activity);
-        AddEditLoginInfoActivity activity = activityArray[0];
-
-        EditText editText = new EditText(activity);
-        activity.getParentTextInputLayout(editText);
+        EditText editTextWithNoParent = new EditText(context);
+        AddEditLoginInfoActivity.getParentTextInputLayout(editTextWithNoParent);
     }
 
     @Test(expected = IllegalStateException.class)
     public void getParentTextInputLayoutWrongParentTest() {
 
-        final AddEditLoginInfoActivity[] activityArray = new AddEditLoginInfoActivity[1];
+        RelativeLayout relativeLayout = new RelativeLayout(context);
+        EditText editTextWithWrongParent = new EditText(context);
+        relativeLayout.addView(editTextWithWrongParent);
 
-        activityScenario.onActivity(activity -> activityArray[0] = activity);
-        AddEditLoginInfoActivity activity = activityArray[0];
-
-        RelativeLayout relativeLayout = new RelativeLayout(activity);
-        EditText editText = new EditText(activity);
-        relativeLayout.addView(editText);
-
-        activity.getParentTextInputLayout(editText);
+        AddEditLoginInfoActivity.getParentTextInputLayout(editTextWithWrongParent);
     }
 
     @Test
     public void isValidTextInputTest() {
-        activityScenario.onActivity(activity -> {
-            EditText editText = new EditText(activity);
-            editText.setText("Test");
-            assertTrue(activity.isValidTextInput(editText));
+        EditText editText = new EditText(context);
+        editText.setText("Test");
+        assertTrue(AddEditLoginInfoActivity.isValidTextInput(editText));
 
-            editText.setText(null);
-            assertFalse(activity.isValidTextInput(editText));
-        });
+        editText.setText(null);
+        assertFalse(AddEditLoginInfoActivity.isValidTextInput(editText));
+
+        editText.setText("");
+        assertFalse(AddEditLoginInfoActivity.isValidTextInput(editText));
+
+        editText.setText("       ");
+        assertFalse(AddEditLoginInfoActivity.isValidTextInput(editText));
     }
 
 }
