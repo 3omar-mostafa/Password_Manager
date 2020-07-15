@@ -39,8 +39,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
             mode = Modes.EDIT;
         }
 
-        viewModel = new ViewModelProvider(this, new AddEditLoginInfoViewModel.Factory(id))
-                .get(AddEditLoginInfoViewModel.class);
+        viewModel = getViewModel(new AddEditLoginInfoViewModel.Factory(id));
 
         LiveData<LoginInfo> loginInfoData = viewModel.getLoginInfo();
 
@@ -53,6 +52,18 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
 
         initializeViews();
 
+    }
+
+
+    /**
+     * The real usage of this method is in testing, to have the ability to inject mocked view model
+     *
+     * @param factory Factory to create view model with it
+     *
+     * @return the created view model
+     */
+    protected AddEditLoginInfoViewModel getViewModel(ViewModelProvider.Factory factory) {
+        return new ViewModelProvider(this, factory).get(AddEditLoginInfoViewModel.class);
     }
 
     protected void bindViewsWithData(@NonNull LoginInfo loginInfo) {

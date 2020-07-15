@@ -12,12 +12,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Lifecycle.State;
+import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.intercepting.SingleActivityFactory;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
 import com.hafez.password_manager.database.DatabaseTestUtils;
 import com.hafez.password_manager.database.LoginInfoDao;
@@ -40,9 +43,23 @@ public class AddLoginInfoActivityTest {
     @Rule
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
 
+    // Used to inject view model before onCreate method in the activity, and delay finish activity
+    private SingleActivityFactory<AddEditLoginInfoActivity> activityFactory = new SingleActivityFactory<AddEditLoginInfoActivity>(
+            AddEditLoginInfoActivity.class) {
+        @Override
+        protected AddEditLoginInfoActivity create(Intent intent) {
+            return new AddEditLoginInfoActivity() {
+                @Override
+                protected AddEditLoginInfoViewModel getViewModel(Factory factory) {
+                    return getViewModelWithInMemoryDatabase();
+                }
+            };
+        }
+    };
+
     @Rule
     public ActivityTestRule<AddEditLoginInfoActivity> activityRule = new ActivityTestRule<>(
-            AddEditLoginInfoActivity.class, true, true);
+            activityFactory, true, true);
 
 
     private LoginInfoRepository repository;
@@ -55,7 +72,6 @@ public class AddLoginInfoActivityTest {
 
         activity = activityRule.getActivity();
 
-        activity.viewModel = getViewModelWithInMemoryDatabase();
     }
 
     @NonNull
