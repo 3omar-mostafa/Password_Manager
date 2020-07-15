@@ -62,5 +62,6 @@ dependencies {
     androidTestImplementation 'androidx.arch.core:core-testing:2.1.0'
     testImplementation "androidx.room:room-testing:2.2.5"
     androidTestImplementation "androidx.room:room-testing:2.2.5"
-
+    testImplementation "androidx.test:rules:1.2.0"
+    androidTestImplementation "androidx.test:rules:1.2.0"
 }

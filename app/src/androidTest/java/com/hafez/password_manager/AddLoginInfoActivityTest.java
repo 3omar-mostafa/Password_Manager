@@ -15,10 +15,9 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Lifecycle.State;
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewAssertion;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.rule.ActivityTestRule;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
 import com.hafez.password_manager.database.DatabaseTestUtils;
 import com.hafez.password_manager.database.LoginInfoDao;
@@ -42,20 +41,21 @@ public class AddLoginInfoActivityTest {
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
 
     @Rule
-    public ActivityScenarioRule<AddEditLoginInfoActivity> activityScenarioRule =
-            new ActivityScenarioRule<>(AddEditLoginInfoActivity.class);
+    public ActivityTestRule<AddEditLoginInfoActivity> activityRule = new ActivityTestRule<>(
+            AddEditLoginInfoActivity.class, true, true);
 
-    private ActivityScenario<AddEditLoginInfoActivity> activityScenario;
+
     private LoginInfoRepository repository;
     private Context context;
+    private AddEditLoginInfoActivity activity;
 
     @Before
     public void init() {
         context = ApplicationProvider.getApplicationContext();
 
-        activityScenario = activityScenarioRule.getScenario().onActivity(activity -> {
-            activity.viewModel = getViewModelWithInMemoryDatabase();
-        });
+        activity = activityRule.getActivity();
+
+        activity.viewModel = getViewModelWithInMemoryDatabase();
     }
 
     @NonNull
@@ -112,7 +112,7 @@ public class AddLoginInfoActivityTest {
 
         Thread.sleep(1000);
 
-        assertEquals(State.RESUMED, activityScenario.getState());
+        assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
     }
@@ -138,7 +138,7 @@ public class AddLoginInfoActivityTest {
 
         Thread.sleep(1000);
 
-        assertEquals(State.RESUMED, activityScenario.getState());
+        assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
     }
@@ -164,7 +164,7 @@ public class AddLoginInfoActivityTest {
 
         Thread.sleep(1000);
 
-        assertEquals(State.RESUMED, activityScenario.getState());
+        assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         DatabaseTestUtils.assertThatDatabaseIsEmpty(repository);
     }
