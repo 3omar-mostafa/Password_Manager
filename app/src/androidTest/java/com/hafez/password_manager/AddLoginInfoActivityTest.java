@@ -39,7 +39,8 @@ import org.junit.Test;
 /**
  * The {@link AddEditLoginInfoActivity} Class Test is separated into three test classes, class for
  * general functions in {@link AddEditLoginInfoActivityTest} , class for Add part which is this
- * class, i.e. {@link AddLoginInfoActivityTest}.
+ * class, i.e. {@link AddLoginInfoActivityTest} , and class for Edit part in {@link
+ * EditLoginInfoActivityTest}.
  */
 public class AddLoginInfoActivityTest {
 

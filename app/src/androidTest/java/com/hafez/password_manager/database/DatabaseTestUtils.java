@@ -28,6 +28,27 @@ public class DatabaseTestUtils {
         repository.getAllLoginInfoList().removeObserver(observer);
     }
 
+    public static long getLoginInfoTableSize(LoginInfoRepository repository) {
+
+        final long[] size = {0};
+
+        TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
+            @Override
+            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
+                size[0] = loginInfoList.size();
+            }
+        };
+
+        repository.getAllLoginInfoList().observeForever(observer);
+
+        assertTrue(observer.isOnChangedCalled());
+
+        repository.getAllLoginInfoList().removeObserver(observer);
+
+        return size[0];
+    }
+
+
     public static AppDatabase getInMemoryDatabase() {
         return Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(),
                 AppDatabase.class).build();
