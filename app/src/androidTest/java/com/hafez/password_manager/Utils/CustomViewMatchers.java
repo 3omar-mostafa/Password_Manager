@@ -4,6 +4,7 @@ import static androidx.test.internal.util.Checks.checkNotNull;
 import static org.hamcrest.Matchers.is;
 
 import android.view.View;
+import androidx.annotation.NonNull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.hamcrest.BaseMatcher;
@@ -12,8 +13,12 @@ import org.hamcrest.Matcher;
 
 public class CustomViewMatchers {
 
-    public static Matcher<View> hasErrorText(final String expectedError) {
+    public static Matcher<View> hasErrorText(@NonNull final String expectedError) {
         return new HasErrorTextMatcher(checkNotNull(is(expectedError)));
+    }
+
+    public static Matcher<View> hasNoErrorText() {
+        return new HasErrorTextMatcher(null);
     }
 
     public static class HasErrorTextMatcher extends BaseMatcher<View> {
@@ -26,8 +31,12 @@ public class CustomViewMatchers {
 
         @Override
         public void describeTo(Description description) {
-            description.appendText("with error: ");
-            stringMatcher.describeTo(description);
+            if (stringMatcher == null) {
+                description.appendText("View Contains No Errors");
+            } else {
+                description.appendText("with error: ");
+                stringMatcher.describeTo(description);
+            }
         }
 
         @Override
@@ -35,6 +44,12 @@ public class CustomViewMatchers {
             try {
                 Method method = item.getClass().getMethod("getError");
                 String e = (String) method.invoke(item);
+
+                // If StringMatcher is null (i.e. no error) then getError should also return null
+                if (stringMatcher == null) {
+                    return e == null;
+                }
+
                 return stringMatcher.matches(e);
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                 return false;
