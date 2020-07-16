@@ -1,11 +1,11 @@
 package com.hafez.password_manager.database;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
-import com.hafez.password_manager.TestObserver;
+import com.hafez.password_manager.LiveDataUtils;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.List;
@@ -13,39 +13,19 @@ import java.util.List;
 public class DatabaseTestUtils {
 
     public static void assertThatLoginInfoTableIsEmpty(LoginInfoRepository repository) {
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
 
-        TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertEquals(0, loginInfoList.size());
-            }
-        };
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-        repository.getAllLoginInfoList().observeForever(observer);
-
-        assertTrue(observer.isOnChangedCalled());
-
-        repository.getAllLoginInfoList().removeObserver(observer);
+        assertTrue(loginInfoList.isEmpty());
     }
 
     public static long getLoginInfoTableSize(LoginInfoRepository repository) {
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
 
-        final long[] size = {0};
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-        TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                size[0] = loginInfoList.size();
-            }
-        };
-
-        repository.getAllLoginInfoList().observeForever(observer);
-
-        assertTrue(observer.isOnChangedCalled());
-
-        repository.getAllLoginInfoList().removeObserver(observer);
-
-        return size[0];
+        return loginInfoList.size();
     }
 
 

@@ -1,14 +1,8 @@
 package com.hafez.password_manager;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withChild;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,6 +15,8 @@ import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.ViewAssertion;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
@@ -43,6 +39,7 @@ import org.junit.Test;
  */
 public class AddLoginInfoActivityTest {
 
+    // Allows Android Architecture Components (ex. Live Data) to executes each task synchronously.
     @Rule
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
 
@@ -96,16 +93,25 @@ public class AddLoginInfoActivityTest {
         String sampleUsername = "sample_username";
         String samplePassword = "sample_password";
 
-        onView(withId(R.id.username)).perform(typeText(sampleUsername));
-        onView(withId(R.id.password)).perform(typeText(samplePassword));
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         ViewAssertion hasNoErrorMessage = matches(CustomViewMatchers.hasErrorText(null));
 
-        onView(withChild(withChild(withId(R.id.username)))).check(hasNoErrorMessage);
-        onView(withChild(withChild(withId(R.id.password)))).check(hasNoErrorMessage);
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
+                .check(hasNoErrorMessage);
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(doesNotExist());
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
+                .check(hasNoErrorMessage);
+
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(doesNotExist());
 
         TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
             @Override
@@ -130,17 +136,20 @@ public class AddLoginInfoActivityTest {
     public void failedInsertionInvalidInputTest() throws InterruptedException {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.save)).perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
         ViewAssertion hasErrorMessage = matches(CustomViewMatchers.hasErrorText(error));
 
-        onView(withChild(withChild(withId(R.id.username)))).check(hasErrorMessage);
-        onView(withChild(withChild(withId(R.id.password)))).check(hasErrorMessage);
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
+                .check(hasErrorMessage);
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
+                .check(hasErrorMessage);
 
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-                .check(matches(isDisplayed()))
-                .check(matches(withText(R.string.error_save_validation)));
+
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()))
+                .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
         Thread.sleep(1000);
 
@@ -154,19 +163,22 @@ public class AddLoginInfoActivityTest {
     public void failedInsertionInvalidUsernameTest() throws InterruptedException {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
-        onView(withId(R.id.password)).perform(typeText("password"));
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText("password"));
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
-        onView(withChild(withChild(withId(R.id.username))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
                 .check(matches(CustomViewMatchers.hasErrorText(error)));
 
-        onView(withChild(withChild(withId(R.id.password))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
                 .check(matches(CustomViewMatchers.hasErrorText(null)));
 
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-                .check(matches(isDisplayed()))
-                .check(matches(withText(R.string.error_save_validation)));
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()))
+                .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
         Thread.sleep(1000);
 
@@ -180,19 +192,22 @@ public class AddLoginInfoActivityTest {
     public void failedInsertionInvalidPasswordTest() throws InterruptedException {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
-        onView(withId(R.id.username)).perform(typeText("username"));
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText("username"));
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
-        onView(withChild(withChild(withId(R.id.password))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
                 .check(matches(CustomViewMatchers.hasErrorText(error)));
 
-        onView(withChild(withChild(withId(R.id.username))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
                 .check(matches(CustomViewMatchers.hasErrorText(null)));
 
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-                .check(matches(isDisplayed()))
-                .check(matches(withText(R.string.error_save_validation)));
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()))
+                .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
         Thread.sleep(1000);
 

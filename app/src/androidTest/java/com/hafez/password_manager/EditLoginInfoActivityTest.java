@@ -1,27 +1,21 @@
 package com.hafez.password_manager;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBackUnconditionally;
-import static androidx.test.espresso.action.ViewActions.clearText;
-import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withChild;
-import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import androidx.lifecycle.Lifecycle.State;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.ViewAssertion;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
@@ -104,8 +98,11 @@ public class EditLoginInfoActivityTest {
 
     @Test
     public void initialDataLoadedSuccessfullyTest() {
-        onView(withId(R.id.username)).check(matches(withText(initialLoginInfo.getUsername())));
-        onView(withId(R.id.password)).check(matches(withText(initialLoginInfo.getPassword())));
+        onView(ViewMatchers.withId(R.id.username))
+                .check(matches(ViewMatchers.withText(initialLoginInfo.getUsername())));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .check(matches(ViewMatchers.withText(initialLoginInfo.getPassword())));
     }
 
 
@@ -114,8 +111,12 @@ public class EditLoginInfoActivityTest {
 
         String newUsername = "new_username";
 
-        onView(withId(R.id.username)).perform(clearText()).perform(typeText(newUsername));
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText())
+                .perform(ViewActions.typeText(newUsername));
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         assertNoErrors();
 
@@ -128,8 +129,12 @@ public class EditLoginInfoActivityTest {
 
         String newPassword = "new_password";
 
-        onView(withId(R.id.password)).perform(clearText()).perform(typeText(newPassword));
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText())
+                .perform(ViewActions.typeText(newPassword));
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         assertNoErrors();
 
@@ -142,9 +147,16 @@ public class EditLoginInfoActivityTest {
         String newUsername = "new_username";
         String newPassword = "new_password";
 
-        onView(withId(R.id.username)).perform(clearText()).perform(typeText(newUsername));
-        onView(withId(R.id.password)).perform(clearText()).perform(typeText(newPassword));
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText())
+                .perform(ViewActions.typeText(newUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText())
+                .perform(ViewActions.typeText(newPassword));
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         assertNoErrors();
 
@@ -154,7 +166,8 @@ public class EditLoginInfoActivityTest {
     @Test
     public void saveWithNoChangesTest() {
 
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         assertNoErrors();
 
@@ -165,7 +178,7 @@ public class EditLoginInfoActivityTest {
     @Test
     public void pressBackWithNoChangesTest() {
 
-        pressBackUnconditionally();
+        Espresso.pressBackUnconditionally();
 
         assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(),
                 initialLoginInfo.getPassword());
@@ -174,7 +187,8 @@ public class EditLoginInfoActivityTest {
     @Test
     public void pressUpWithNoChangesTest() {
 
-        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+        onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                .perform(ViewActions.click());
 
         assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(),
                 initialLoginInfo.getPassword());
@@ -184,19 +198,27 @@ public class EditLoginInfoActivityTest {
     public void updateInvalidInputTest() throws InterruptedException {
         long initialDatabaseSize = getLoginInfoTableSize();
 
-        onView(withId(R.id.username)).perform(clearText());
-        onView(withId(R.id.password)).perform(clearText());
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText());
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText());
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
         ViewAssertion hasErrorMessage = matches(CustomViewMatchers.hasErrorText(error));
 
-        onView(withChild(withChild(withId(R.id.username)))).check(hasErrorMessage);
-        onView(withChild(withChild(withId(R.id.password)))).check(hasErrorMessage);
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
+                .check(hasErrorMessage);
 
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-                .check(matches(isDisplayed()))
-                .check(matches(withText(R.string.error_save_validation)));
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
+                .check(hasErrorMessage);
+
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()))
+                .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
         Thread.sleep(1000);
 
@@ -211,19 +233,22 @@ public class EditLoginInfoActivityTest {
     public void updateInvalidUsernameTest() throws InterruptedException {
         long initialDatabaseSize = getLoginInfoTableSize();
 
-        onView(withId(R.id.username)).perform(clearText());
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText());
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
-        onView(withChild(withChild(withId(R.id.username))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
                 .check(matches(CustomViewMatchers.hasErrorText(error)));
 
-        onView(withChild(withChild(withId(R.id.password))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
                 .check(matches(CustomViewMatchers.hasErrorText(null)));
 
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-                .check(matches(isDisplayed()))
-                .check(matches(withText(R.string.error_save_validation)));
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()))
+                .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
         Thread.sleep(1000);
 
@@ -238,19 +263,22 @@ public class EditLoginInfoActivityTest {
     public void updateInvalidPasswordTest() throws InterruptedException {
         long initialDatabaseSize = getLoginInfoTableSize();
 
-        onView(withId(R.id.password)).perform(clearText());
-        onView(withId(R.id.save)).perform(click());
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText());
+
+        onView(ViewMatchers.withId(R.id.save))
+                .perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
-        onView(withChild(withChild(withId(R.id.password))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
                 .check(matches(CustomViewMatchers.hasErrorText(error)));
 
-        onView(withChild(withChild(withId(R.id.username))))
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
                 .check(matches(CustomViewMatchers.hasErrorText(null)));
 
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-                .check(matches(isDisplayed()))
-                .check(matches(withText(R.string.error_save_validation)));
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()))
+                .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
         Thread.sleep(1000);
 
@@ -264,10 +292,14 @@ public class EditLoginInfoActivityTest {
     private void assertNoErrors() {
         ViewAssertion hasNoErrorMessage = matches(CustomViewMatchers.hasErrorText(null));
 
-        onView(withChild(withChild(withId(R.id.username)))).check(hasNoErrorMessage);
-        onView(withChild(withChild(withId(R.id.password)))).check(hasNoErrorMessage);
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
+                .check(hasNoErrorMessage);
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(doesNotExist());
+        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
+                .check(hasNoErrorMessage);
+
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(doesNotExist());
     }
 
     private void assertDatabaseEquals(long id, String username, String password) {
@@ -275,22 +307,15 @@ public class EditLoginInfoActivityTest {
 
         final int databaseSize = 1;
 
-        TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertEquals(databaseSize, loginInfoList.size());
-                LoginInfo loginInfo = loginInfoList.get(0);
-                assertEquals(id, loginInfo.getId());
-                assertEquals(username, loginInfo.getUsername());
-                assertEquals(password, loginInfo.getPassword());
-            }
-        };
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
 
-        repository.getAllLoginInfoList().observeForever(observer);
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-        assertTrue(observer.isOnChangedCalled());
-
-        repository.getAllLoginInfoList().removeObserver(observer);
+        assertEquals(databaseSize, loginInfoList.size());
+        LoginInfo loginInfo = loginInfoList.get(0);
+        assertEquals(id, loginInfo.getId());
+        assertEquals(username, loginInfo.getUsername());
+        assertEquals(password, loginInfo.getPassword());
 
         InstantTaskExecutorUtils.turnOff();
     }
