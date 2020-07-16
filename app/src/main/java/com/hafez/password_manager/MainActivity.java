@@ -17,8 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(viewBinding.getRoot());
 
-        LoginInfoViewModel viewModel = new ViewModelProvider(this,
-                new LoginInfoViewModel.Factory()).get(LoginInfoViewModel.class);
+        LoginInfoViewModel viewModel = getViewModel(new LoginInfoViewModel.Factory());
 
         LoginInfoAdapter adapter = new LoginInfoAdapter();
         viewBinding.loginInfoRecyclerView.setAdapter(adapter);
@@ -38,6 +37,17 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+    }
+
+    /**
+     * The real usage of this method is in testing, to have the ability to inject mocked view model
+     *
+     * @param factory Factory to create view model with it
+     *
+     * @return the created view model
+     */
+    protected LoginInfoViewModel getViewModel(ViewModelProvider.Factory factory) {
+        return new ViewModelProvider(this, factory).get(LoginInfoViewModel.class);
     }
 
 }
