@@ -102,11 +102,11 @@ public class AddLoginInfoActivityTest {
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
 
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasNoErrorText()));
+        onView(ViewMatchers.withId(R.id.username))
+                .check(matches(CustomViewMatchers.parentHasNoErrorText()));
 
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
-                .check(matches(CustomViewMatchers.hasNoErrorText()));
+        onView(ViewMatchers.withId(R.id.password))
+                .check(matches(CustomViewMatchers.parentHasNoErrorText()));
 
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(doesNotExist());
@@ -138,11 +138,11 @@ public class AddLoginInfoActivityTest {
 
         String error = context.getString(R.string.error_text);
 
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasErrorText(error)));
+        onView(ViewMatchers.withId(R.id.username))
+                .check(matches(CustomViewMatchers.parentHasErrorText(error)));
 
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
-                .check(matches(CustomViewMatchers.hasErrorText(error)));
+        onView(ViewMatchers.withId(R.id.password))
+                .check(matches(CustomViewMatchers.parentHasErrorText(error)));
 
 
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
@@ -168,11 +168,11 @@ public class AddLoginInfoActivityTest {
                 .perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasErrorText(error)));
+        onView(ViewMatchers.withId(R.id.username))
+                .check(matches(CustomViewMatchers.parentHasErrorText(error)));
 
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
-                .check(matches(CustomViewMatchers.hasNoErrorText()));
+        onView(ViewMatchers.withId(R.id.password))
+                .check(matches(CustomViewMatchers.parentHasNoErrorText()));
 
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(matches(ViewMatchers.isDisplayed()))
@@ -197,11 +197,11 @@ public class AddLoginInfoActivityTest {
                 .perform(ViewActions.click());
 
         String error = context.getString(R.string.error_text);
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.password))))
-                .check(matches(CustomViewMatchers.hasErrorText(error)));
+        onView(ViewMatchers.withId(R.id.password))
+                .check(matches(CustomViewMatchers.parentHasErrorText(error)));
 
-        onView(ViewMatchers.withChild(ViewMatchers.withChild(ViewMatchers.withId(R.id.username))))
-                .check(matches(CustomViewMatchers.hasNoErrorText()));
+        onView(ViewMatchers.withId(R.id.username))
+                .check(matches(CustomViewMatchers.parentHasNoErrorText()));
 
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(matches(ViewMatchers.isDisplayed()))
