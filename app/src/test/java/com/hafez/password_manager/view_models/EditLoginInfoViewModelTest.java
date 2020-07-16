@@ -3,18 +3,16 @@ package com.hafez.password_manager.view_models;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
+import com.hafez.password_manager.LiveDataUtils;
 import com.hafez.password_manager.R;
-import com.hafez.password_manager.TestObserver;
 import com.hafez.password_manager.mock.MockRepository;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,16 +27,15 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class EditLoginInfoViewModelTest {
 
+    // Allows Android Architecture Components (ex. Live Data) to executes each task synchronously.
     @Rule
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
 
     private AddEditLoginInfoViewModel viewModel;
 
     private List<LoginInfo> loginInfoExpectedList;
-    private TestObserver<List<LoginInfo>> allListObserver;
     private LoginInfoRepository repository;
     private LoginInfo toBeEditedLoginInfo;
-    private TestObserver<LoginInfo> toBeEditedLoginInfoObserver;
 
     @Before
     public void init() {
@@ -61,14 +58,6 @@ public class EditLoginInfoViewModelTest {
         return new MockRepository(loginInfoExpectedList);
     }
 
-    @After
-    public void cleanup() {
-        repository.getAllLoginInfoList().removeObserver(allListObserver);
-        if (toBeEditedLoginInfoObserver != null) {
-            viewModel.getLoginInfo().removeObserver(toBeEditedLoginInfoObserver);
-        }
-    }
-
 
     @Test
     public void updateLoginInfoTest() {
@@ -80,21 +69,15 @@ public class EditLoginInfoViewModelTest {
 
         viewModel.insertOrUpdateLoginInfo(updatedData);
 
-        allListObserver = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertNotNull(loginInfoList);
-                assertFalse(loginInfoList.isEmpty());
-                assertEquals(loginInfoList.size(), loginInfoExpectedList.size());
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-                LoginInfo loginInfo = loginInfoList.get(firstElement);
-                assertEquals(updatedData, loginInfo);
-            }
-        };
+        assertNotNull(loginInfoList);
+        assertFalse(loginInfoList.isEmpty());
+        assertEquals(loginInfoList.size(), loginInfoExpectedList.size());
 
-        repository.getAllLoginInfoList().observeForever(allListObserver);
-
-        assertTrue(allListObserver.isOnChangedCalled());
+        LoginInfo loginInfo = loginInfoList.get(firstElement);
+        assertEquals(updatedData, loginInfo);
     }
 
     @Test
@@ -103,19 +86,13 @@ public class EditLoginInfoViewModelTest {
 
         viewModel.deleteLoginInfo(loginInfoExpectedList.get(firstElement));
 
-        allListObserver = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertNotNull(loginInfoList);
-                assertFalse(loginInfoList.isEmpty());
-                assertEquals(loginInfoExpectedList.size() - 1, loginInfoList.size());
-                assertFalse(loginInfoList.contains(loginInfoExpectedList.get(firstElement)));
-            }
-        };
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-        repository.getAllLoginInfoList().observeForever(allListObserver);
-
-        assertTrue(allListObserver.isOnChangedCalled());
+        assertNotNull(loginInfoList);
+        assertFalse(loginInfoList.isEmpty());
+        assertEquals(loginInfoExpectedList.size() - 1, loginInfoList.size());
+        assertFalse(loginInfoList.contains(loginInfoExpectedList.get(firstElement)));
     }
 
     @Test
@@ -124,17 +101,10 @@ public class EditLoginInfoViewModelTest {
 
         assertNotNull(loginInfoLiveData);
 
-        toBeEditedLoginInfoObserver = new TestObserver<LoginInfo>() {
-            @Override
-            public void onChangedBehaviour(LoginInfo loginInfo) {
-                assertNotNull(loginInfo);
-                assertEquals(loginInfo, toBeEditedLoginInfo);
-            }
-        };
+        LoginInfo loginInfo = LiveDataUtils.getValueOf(loginInfoLiveData);
 
-        loginInfoLiveData.observeForever(toBeEditedLoginInfoObserver);
-
-        assertTrue(toBeEditedLoginInfoObserver.isOnChangedCalled());
+        assertNotNull(loginInfo);
+        assertEquals(loginInfo, toBeEditedLoginInfo);
     }
 
 }

@@ -8,14 +8,13 @@ import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
+import com.hafez.password_manager.LiveDataUtils;
 import com.hafez.password_manager.R;
-import com.hafez.password_manager.TestObserver;
 import com.hafez.password_manager.mock.MockRepository;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,13 +29,13 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class AddLoginInfoViewModelTest {
 
+    // Allows Android Architecture Components (ex. Live Data) to executes each task synchronously.
     @Rule
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
 
     private AddEditLoginInfoViewModel viewModel;
 
     private List<LoginInfo> loginInfoExpectedList;
-    private TestObserver<List<LoginInfo>> observer;
     private LoginInfoRepository repository;
 
     @Before
@@ -58,11 +57,6 @@ public class AddLoginInfoViewModelTest {
         return new MockRepository(loginInfoExpectedList);
     }
 
-    @After
-    public void cleanup() {
-        repository.getAllLoginInfoList().removeObserver(observer);
-    }
-
 
     @Test
     public void insertLoginInfoTest() {
@@ -71,41 +65,29 @@ public class AddLoginInfoViewModelTest {
 
         viewModel.insertOrUpdateLoginInfo(newData);
 
-        observer = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertNotNull(loginInfoList);
-                assertFalse(loginInfoList.isEmpty());
-                assertEquals(loginInfoList.size(), loginInfoExpectedList.size() + 1);
-                assertTrue(loginInfoList.contains(newData));
-            }
-        };
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-        repository.getAllLoginInfoList().observeForever(observer);
-
-        assertTrue(observer.isOnChangedCalled());
+        assertNotNull(loginInfoList);
+        assertFalse(loginInfoList.isEmpty());
+        assertEquals(loginInfoList.size(), loginInfoExpectedList.size() + 1);
+        assertTrue(loginInfoList.contains(newData));
     }
 
     @Test
-    public void deleteLoginInfoTest() {
+    public void deleteUnExistingLoginInfoTest() {
         LoginInfo unExistingElement = new LoginInfo("does_not_exist", "does_not_exist", 0);
         unExistingElement.setId(loginInfoExpectedList.size() + 1);
 
         viewModel.deleteLoginInfo(unExistingElement);
 
-        observer = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertNotNull(loginInfoList);
-                assertFalse(loginInfoList.isEmpty());
-                assertEquals(loginInfoExpectedList.size(), loginInfoList.size());
-                assertFalse(loginInfoList.contains(unExistingElement));
-            }
-        };
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-        repository.getAllLoginInfoList().observeForever(observer);
-
-        assertTrue(observer.isOnChangedCalled());
+        assertNotNull(loginInfoList);
+        assertFalse(loginInfoList.isEmpty());
+        assertEquals(loginInfoExpectedList.size(), loginInfoList.size());
+        assertFalse(loginInfoList.contains(unExistingElement));
     }
 
     @Test
