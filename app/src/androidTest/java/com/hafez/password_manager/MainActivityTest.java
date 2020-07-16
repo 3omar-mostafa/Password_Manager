@@ -1,13 +1,18 @@
 package com.hafez.password_manager;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static com.hafez.password_manager.AddEditLoginInfoActivity.ARGUMENT_LOGIN_INFO_ID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
 import android.app.Instrumentation.ActivityResult;
 import android.content.Intent;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.intent.Intents;
@@ -60,21 +65,30 @@ public class MainActivityTest {
     }
 
 
-    private LoginInfoRepository repository;
-    private List<LoginInfo> loginInfoDatabaseList;
-    private MainActivity activity;
-
-    @Before
-    public void init() {
-
-        fillDatabaseWithSampleData();
-
+    private List<LoginInfo> getLoginInfoListFromDatabase() {
         InstantTaskExecutorUtils.turnOn();
 
         LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
-        loginInfoDatabaseList = LiveDataUtils.getValueOf(liveData);
+        List<LoginInfo> list = LiveDataUtils.getValueOf(liveData);
 
         InstantTaskExecutorUtils.turnOff();
+
+        return list;
+    }
+
+    private LoginInfoRepository repository;
+    private List<LoginInfo> initialLoginInfoDatabaseList;
+    private MainActivity activity;
+
+
+    @Before
+    public void init() throws InterruptedException {
+
+        fillDatabaseWithSampleData();
+
+        Thread.sleep(3000); // We need some time to get data actually in database
+
+        initialLoginInfoDatabaseList = getLoginInfoListFromDatabase();
 
         activity = activityRule.getActivity();
 
@@ -113,7 +127,7 @@ public class MainActivityTest {
         onView(ViewMatchers.withId(R.id.login_info_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(position, ViewActions.click()));
 
-        long id = loginInfoDatabaseList.get(position).getId();
+        long id = initialLoginInfoDatabaseList.get(position).getId();
         Intents.intended(IntentMatchers.hasExtra(ARGUMENT_LOGIN_INFO_ID, id));
 
     }
@@ -122,20 +136,78 @@ public class MainActivityTest {
     @Test
     public void clickLastItemInRecyclerViewAndVerifyIntentTest() {
 
-        final int position = loginInfoDatabaseList.size() - 1;
+        final int position = initialLoginInfoDatabaseList.size() - 1;
 
         // Replaces Intent to open AddEditLoginInfoActivity with mock
         Intents.intending(IntentMatchers.hasComponent(AddEditLoginInfoActivity.class.getName()))
                 .respondWith(new ActivityResult(Activity.RESULT_OK, null));
 
         onView(ViewMatchers.withId(R.id.login_info_recycler_view))
-                .perform(RecyclerViewActions.scrollToPosition(position));
-
-        onView(ViewMatchers.withId(R.id.login_info_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(position, ViewActions.click()));
 
-        long id = loginInfoDatabaseList.get(position).getId();
+        long id = initialLoginInfoDatabaseList.get(position).getId();
         Intents.intended(IntentMatchers.hasExtra(ARGUMENT_LOGIN_INFO_ID, id));
 
     }
+
+    private void swipeItemInRecyclerViewAndCheckItIsDeleted(int position, ViewAction swipeAction)
+            throws InterruptedException {
+
+        onView(ViewMatchers.withId(R.id.login_info_recycler_view))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(position, swipeAction));
+
+        Thread.sleep(1000);
+
+        List<LoginInfo> loginInfoList = getLoginInfoListFromDatabase();
+
+        assertEquals(initialLoginInfoDatabaseList.size() - 1, loginInfoList.size());
+        assertFalse(loginInfoList.contains(initialLoginInfoDatabaseList.get(position)));
+    }
+
+    @Test
+    public void swipeLeftToDeleteTest() throws InterruptedException {
+
+        final int position = 5;
+
+        swipeItemInRecyclerViewAndCheckItIsDeleted(position, ViewActions.swipeLeft());
+
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()));
+
+    }
+
+    @Test
+    public void swipeRightToDeleteTest() throws InterruptedException {
+
+        final int position = initialLoginInfoDatabaseList.size() - 1;
+
+        swipeItemInRecyclerViewAndCheckItIsDeleted(position, ViewActions.swipeRight());
+
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
+                .check(matches(ViewMatchers.isDisplayed()));
+
+    }
+
+    @Test
+    public void undoDeleteTest() throws InterruptedException {
+
+        int position = 1;
+
+        swipeItemInRecyclerViewAndCheckItIsDeleted(position, ViewActions.swipeLeft());
+
+        Thread.sleep(1000);
+
+        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_action))
+                .perform(ViewActions.click());
+
+        Thread.sleep(1000);
+
+        List<LoginInfo> loginInfoList = getLoginInfoListFromDatabase();
+
+        assertEquals(initialLoginInfoDatabaseList.size(), loginInfoList.size());
+        assertTrue(loginInfoList.contains(initialLoginInfoDatabaseList.get(position)));
+
+    }
+
+
 }
