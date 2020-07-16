@@ -6,4 +6,6 @@
     <string name="edit_login_info">Edit Login Information</string>
     <string name="error_text">This Field Is Required</string>
     <string name="error_save_validation">Please Enter All Required Fields</string>
+    <string name="item_deleted_successfully">Item Deleted Successfully</string>
+    <string name="undo">UNDO</string>
 </resources>

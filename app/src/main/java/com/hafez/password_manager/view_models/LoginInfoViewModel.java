@@ -27,6 +27,11 @@ public class LoginInfoViewModel extends ViewModel {
         repository.delete(loginInfo);
     }
 
+
+    public void insert(LoginInfo loginInfo) {
+        repository.insert(loginInfo);
+    }
+
     public void deleteAllLoginInfo() {
         repository.deleteAllLoginInfo();
     }
