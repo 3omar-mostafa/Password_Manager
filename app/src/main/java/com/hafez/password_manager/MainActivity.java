@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             Snackbar.make(snackbarAnchorView, R.string.item_deleted_successfully, 10_000)
                     .setAnchorView(snackbarAnchorView)
                     .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                    .setAction(R.string.undo, v -> viewModel.insert(loginInfo))
+                    .setAction(R.string.undo, v -> viewModel.insertLoginInfo(loginInfo))
                     .show();
         }
 

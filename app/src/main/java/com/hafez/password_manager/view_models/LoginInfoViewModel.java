@@ -28,7 +28,7 @@ public class LoginInfoViewModel extends ViewModel {
     }
 
 
-    public void insert(LoginInfo loginInfo) {
+    public void insertLoginInfo(LoginInfo loginInfo) {
         repository.insert(loginInfo);
     }
 
