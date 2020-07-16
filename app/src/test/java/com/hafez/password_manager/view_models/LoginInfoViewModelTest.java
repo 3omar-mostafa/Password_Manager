@@ -51,6 +51,22 @@ public class LoginInfoViewModelTest {
 
 
     @Test
+    public void insertLoginInfoTest() {
+        LoginInfo newData = new LoginInfo("new_user", "new_pass", 0);
+        newData.setId(loginInfoExpectedList.size() + 1);
+
+        viewModel.insertLoginInfo(newData);
+
+        LiveData<List<LoginInfo>> liveData = viewModel.getLoginInfoLiveDataList();
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
+
+        assertNotNull(loginInfoList);
+        assertFalse(loginInfoList.isEmpty());
+        assertEquals(loginInfoList.size(), loginInfoExpectedList.size() + 1);
+        assertTrue(loginInfoList.contains(newData));
+    }
+
+    @Test
     public void getLoginInfoLiveDataListTest() {
 
         LiveData<List<LoginInfo>> liveData = viewModel.getLoginInfoLiveDataList();
