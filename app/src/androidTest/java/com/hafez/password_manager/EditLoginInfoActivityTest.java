@@ -97,6 +97,11 @@ public class EditLoginInfoActivityTest {
 
     @Test
     public void initialDataLoadedSuccessfullyTest() {
+
+        String title = context.getString(R.string.edit_login_info);
+
+        assertEquals(title, activity.getTitle());
+
         onView(ViewMatchers.withId(R.id.username))
                 .check(matches(ViewMatchers.withText(initialLoginInfo.getUsername())));
 

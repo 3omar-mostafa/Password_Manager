@@ -87,6 +87,23 @@ public class AddLoginInfoActivityTest {
         return new AddEditLoginInfoViewModel(repository);
     }
 
+
+    @Test
+    public void initialTest() {
+
+        String title = context.getString(R.string.add_login_info);
+
+        assertEquals(title, activity.getTitle());
+
+        onView(ViewMatchers.withId(R.id.username))
+                .check(matches(ViewMatchers.withText("")));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .check(matches(ViewMatchers.withText("")));
+    }
+
+
+
     @Test
     public void successfulInsertionTest() {
 
