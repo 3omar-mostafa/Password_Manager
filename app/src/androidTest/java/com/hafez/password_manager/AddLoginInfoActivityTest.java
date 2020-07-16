@@ -4,7 +4,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +11,9 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Lifecycle.State;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
@@ -128,22 +127,15 @@ public class AddLoginInfoActivityTest {
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(doesNotExist());
 
-        TestObserver<List<LoginInfo>> observer = new TestObserver<List<LoginInfo>>() {
-            @Override
-            public void onChangedBehaviour(List<LoginInfo> loginInfoList) {
-                assertEquals(1, loginInfoList.size());
-                LoginInfo loginInfo = loginInfoList.get(0);
-                assertEquals(1, loginInfo.getId());
-                assertEquals(sampleUsername, loginInfo.getUsername());
-                assertEquals(samplePassword, loginInfo.getPassword());
-            }
-        };
+        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
 
-        repository.getAllLoginInfoList().observeForever(observer);
+        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
-        assertTrue(observer.isOnChangedCalled());
-
-        repository.getAllLoginInfoList().removeObserver(observer);
+        assertEquals(1, loginInfoList.size());
+        LoginInfo loginInfo = loginInfoList.get(0);
+        assertEquals(1, loginInfo.getId());
+        assertEquals(sampleUsername, loginInfo.getUsername());
+        assertEquals(samplePassword, loginInfo.getPassword());
     }
 
 
