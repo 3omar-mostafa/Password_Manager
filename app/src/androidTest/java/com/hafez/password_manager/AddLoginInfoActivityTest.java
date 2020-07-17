@@ -38,6 +38,9 @@ import org.junit.Test;
  */
 public class AddLoginInfoActivityTest {
 
+    @Rule(order = Integer.MIN_VALUE)
+    public RetryFailedTestsRule retryFailedTestsRule = new RetryFailedTestsRule(5);
+
     // Allows Android Architecture Components (ex. Live Data) to executes each task synchronously.
     @Rule
     public InstantTaskExecutorRule executorRule = new InstantTaskExecutorRule();
@@ -56,7 +59,7 @@ public class AddLoginInfoActivityTest {
                 @Override
                 public void finish() {
                     // Delay finish to have time to make some checks on activity
-                    new Handler().postDelayed(super::finish, 1000);
+                    new Handler().postDelayed(super::finish, 3000);
                 }
             };
         }
@@ -140,7 +143,7 @@ public class AddLoginInfoActivityTest {
 
 
     @Test
-    public void failedInsertionInvalidInputTest() throws InterruptedException {
+    public void failedInsertionInvalidInputTest() {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(ViewMatchers.withId(R.id.save)).perform(ViewActions.click());
@@ -158,8 +161,6 @@ public class AddLoginInfoActivityTest {
                 .check(matches(ViewMatchers.isDisplayed()))
                 .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
-        Thread.sleep(1000);
-
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
@@ -167,7 +168,7 @@ public class AddLoginInfoActivityTest {
 
 
     @Test
-    public void failedInsertionInvalidUsernameTest() throws InterruptedException {
+    public void failedInsertionInvalidUsernameTest() {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(ViewMatchers.withId(R.id.password))
@@ -187,8 +188,6 @@ public class AddLoginInfoActivityTest {
                 .check(matches(ViewMatchers.isDisplayed()))
                 .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
-        Thread.sleep(1000);
-
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
@@ -196,7 +195,7 @@ public class AddLoginInfoActivityTest {
 
 
     @Test
-    public void failedInsertionInvalidPasswordTest() throws InterruptedException {
+    public void failedInsertionInvalidPasswordTest() {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(ViewMatchers.withId(R.id.username))
@@ -215,8 +214,6 @@ public class AddLoginInfoActivityTest {
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(matches(ViewMatchers.isDisplayed()))
                 .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
-
-        Thread.sleep(1000);
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 

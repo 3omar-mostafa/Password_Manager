@@ -29,7 +29,7 @@ public class LiveDataUtils {
         assertTrue(observer.isOnChangedCalled());
 
         try {
-            latch.await(3, TimeUnit.SECONDS);
+            latch.await(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

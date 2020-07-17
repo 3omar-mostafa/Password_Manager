@@ -12,6 +12,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.hafez.password_manager.R;
 import com.hafez.password_manager.LiveDataUtils;
+import com.hafez.password_manager.RetryFailedTestsRule;
 import com.hafez.password_manager.models.LoginInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,9 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
+
+    @Rule(order = Integer.MIN_VALUE)
+    public RetryFailedTestsRule retryFailedTestsRule = new RetryFailedTestsRule(5);
 
     // Allows Android Architecture Components (ex. Live Data) to executes each task synchronously.
     @Rule

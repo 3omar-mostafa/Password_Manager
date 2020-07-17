@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import androidx.test.core.app.ApplicationProvider;
 import com.google.android.material.textfield.TextInputLayout;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -21,6 +22,9 @@ import org.junit.Test;
  * EditLoginInfoActivityTest}.
  */
 public class AddEditLoginInfoActivityTest {
+
+    @Rule(order = Integer.MIN_VALUE)
+    public RetryFailedTestsRule retryFailedTestsRule = new RetryFailedTestsRule(5);
 
     private Context context;
     private TextInputLayout inputLayout;

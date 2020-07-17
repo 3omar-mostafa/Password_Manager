@@ -10,11 +10,14 @@ import static org.junit.Assert.assertTrue;
 import android.app.Activity;
 import android.app.Instrumentation.ActivityResult;
 import android.content.Intent;
+import android.os.SystemClock;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
+import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.espresso.idling.CountingIdlingResource;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.matcher.IntentMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -35,6 +38,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 public class MainActivityTest {
+
+    @Rule(order = Integer.MIN_VALUE)
+    public RetryFailedTestsRule retryFailedTestsRule = new RetryFailedTestsRule(5);
 
     private SingleActivityFactory<MainActivity> activityFactory = new SingleActivityFactory<MainActivity>(
             MainActivity.class) {
@@ -58,10 +64,23 @@ public class MainActivityTest {
 
 
     private void fillDatabaseWithSampleData() {
-        for (int i = 0; i < 15; i++) {
+        idlingResource.increment();
+
+        int size = 15;
+
+        for (int i = 0; i < size; i++) {
             repository.insert(new LoginInfo("username#" + i, "password#" + i,
                     R.drawable.ic_launcher));
         }
+
+        while (true) {
+            SystemClock.sleep(1000);
+            if (getLoginInfoListFromDatabase().size() == size) {
+                idlingResource.decrement();
+                break;
+            }
+        }
+
     }
 
 
@@ -80,13 +99,15 @@ public class MainActivityTest {
     private List<LoginInfo> initialLoginInfoDatabaseList;
     private MainActivity activity;
 
+    private CountingIdlingResource idlingResource = new CountingIdlingResource("Test");
+
 
     @Before
-    public void init() throws InterruptedException {
+    public void init() {
+
+        IdlingRegistry.getInstance().register(idlingResource);
 
         fillDatabaseWithSampleData();
-
-        Thread.sleep(3000); // We need some time to get data actually in database
 
         initialLoginInfoDatabaseList = getLoginInfoListFromDatabase();
 
@@ -97,6 +118,8 @@ public class MainActivityTest {
 
     @After
     public void cleanup() {
+        IdlingRegistry.getInstance().unregister(idlingResource);
+
         Intents.release();
     }
 
@@ -150,13 +173,10 @@ public class MainActivityTest {
 
     }
 
-    private void swipeItemInRecyclerViewAndCheckItIsDeleted(int position, ViewAction swipeAction)
-            throws InterruptedException {
+    private void swipeItemInRecyclerViewAndCheckItIsDeleted(int position, ViewAction swipeAction) {
 
         onView(ViewMatchers.withId(R.id.login_info_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(position, swipeAction));
-
-        Thread.sleep(1000);
 
         List<LoginInfo> loginInfoList = getLoginInfoListFromDatabase();
 
@@ -165,7 +185,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void swipeLeftToDeleteTest() throws InterruptedException {
+    public void swipeLeftToDeleteTest() {
 
         final int position = 5;
 
@@ -177,7 +197,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void swipeRightToDeleteTest() throws InterruptedException {
+    public void swipeRightToDeleteTest() {
 
         final int position = initialLoginInfoDatabaseList.size() - 1;
 
@@ -189,18 +209,14 @@ public class MainActivityTest {
     }
 
     @Test
-    public void undoDeleteTest() throws InterruptedException {
+    public void undoDeleteTest() {
 
         int position = 1;
 
         swipeItemInRecyclerViewAndCheckItIsDeleted(position, ViewActions.swipeLeft());
 
-        Thread.sleep(1000);
-
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_action))
                 .perform(ViewActions.click());
-
-        Thread.sleep(1000);
 
         List<LoginInfo> loginInfoList = getLoginInfoListFromDatabase();
 

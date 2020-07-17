@@ -38,6 +38,8 @@ import org.junit.Test;
  */
 public class EditLoginInfoActivityTest {
 
+    @Rule(order = Integer.MIN_VALUE)
+    public RetryFailedTestsRule retryFailedTestsRule = new RetryFailedTestsRule(5);
 
     // Used to inject view model before onCreate method in the activity, and delay finish activity
     private SingleActivityFactory<AddEditLoginInfoActivity> activityFactory = new SingleActivityFactory<AddEditLoginInfoActivity>(
@@ -53,7 +55,7 @@ public class EditLoginInfoActivityTest {
                 @Override
                 public void finish() {
                     // Delay finish to have time to make some checks on activity
-                    new Handler().postDelayed(super::finish, 1000);
+                    new Handler().postDelayed(super::finish, 3000);
                 }
             };
         }
@@ -199,7 +201,7 @@ public class EditLoginInfoActivityTest {
     }
 
     @Test
-    public void updateInvalidInputTest() throws InterruptedException {
+    public void updateInvalidInputTest() {
         long initialDatabaseSize = getLoginInfoTableSize();
 
         onView(ViewMatchers.withId(R.id.username))
@@ -223,8 +225,6 @@ public class EditLoginInfoActivityTest {
                 .check(matches(ViewMatchers.isDisplayed()))
                 .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
-        Thread.sleep(1000);
-
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         long currentDatabaseSize = getLoginInfoTableSize();
@@ -233,7 +233,7 @@ public class EditLoginInfoActivityTest {
 
 
     @Test
-    public void updateInvalidUsernameTest() throws InterruptedException {
+    public void updateInvalidUsernameTest() {
         long initialDatabaseSize = getLoginInfoTableSize();
 
         onView(ViewMatchers.withId(R.id.username))
@@ -253,8 +253,6 @@ public class EditLoginInfoActivityTest {
                 .check(matches(ViewMatchers.isDisplayed()))
                 .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
 
-        Thread.sleep(1000);
-
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         long currentDatabaseSize = getLoginInfoTableSize();
@@ -263,7 +261,7 @@ public class EditLoginInfoActivityTest {
 
 
     @Test
-    public void updateInvalidPasswordTest() throws InterruptedException {
+    public void updateInvalidPasswordTest() {
         long initialDatabaseSize = getLoginInfoTableSize();
 
         onView(ViewMatchers.withId(R.id.password))
@@ -282,8 +280,6 @@ public class EditLoginInfoActivityTest {
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(matches(ViewMatchers.isDisplayed()))
                 .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
-
-        Thread.sleep(1000);
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
