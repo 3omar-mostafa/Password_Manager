@@ -1,6 +1,7 @@
 package com.hafez.password_manager.models;
 
-import androidx.annotation.IdRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -15,11 +16,13 @@ public class LoginInfo {
     @PrimaryKey(autoGenerate = true)
     private long id = INVALID_ID;
 
-    @IdRes
+    @DrawableRes
     private int iconResourceId;
 
+    @NonNull
     private String username;
 
+    @NonNull
     private String password;
 
     /**
@@ -28,15 +31,16 @@ public class LoginInfo {
     private long lastEditTime;
 
     @Ignore
-    public LoginInfo(String username, String password, int iconResourceId) {
+    public LoginInfo(@NonNull String username, @NonNull String password,
+            @DrawableRes int iconResourceId) {
         this.username = username;
         this.password = password;
         this.iconResourceId = iconResourceId;
         this.lastEditTime = Calendar.getInstance().getTimeInMillis();
     }
 
-    public LoginInfo(long id, String username, String password, int iconResourceId,
-            long lastEditTime) {
+    public LoginInfo(long id, @NonNull String username, @NonNull String password,
+            @DrawableRes int iconResourceId, long lastEditTime) {
         this(username, password, iconResourceId);
         this.id = id;
         this.lastEditTime = lastEditTime;
@@ -50,27 +54,30 @@ public class LoginInfo {
         this.id = id;
     }
 
+    @DrawableRes
     public int getIconResourceId() {
         return iconResourceId;
     }
 
-    public void setIconResourceId(int iconResourceId) {
+    public void setIconResourceId(@DrawableRes int iconResourceId) {
         this.iconResourceId = iconResourceId;
     }
 
+    @NonNull
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(@NonNull String username) {
         this.username = username;
     }
 
+    @NonNull
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(@NonNull String password) {
         this.password = password;
     }
 
