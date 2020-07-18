@@ -39,6 +39,13 @@ public class LoginInfo {
         this.lastEditTime = Calendar.getInstance().getTimeInMillis();
     }
 
+    @Ignore
+    public LoginInfo(long id, @NonNull String username, @NonNull String password,
+            @DrawableRes int iconResourceId) {
+        this(username, password, iconResourceId);
+        this.id = id;
+    }
+
     public LoginInfo(long id, @NonNull String username, @NonNull String password,
             @DrawableRes int iconResourceId, long lastEditTime) {
         this(username, password, iconResourceId);
