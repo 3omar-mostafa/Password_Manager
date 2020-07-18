@@ -4,6 +4,7 @@ import androidx.annotation.IdRes;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import java.util.Calendar;
 import java.util.Objects;
 
 @Entity
@@ -21,16 +22,24 @@ public class LoginInfo {
 
     private String password;
 
+    /**
+     * Time represented as number of milliseconds since the epoch, January 1, 1970, 00:00:00 GMT.
+     */
+    private long lastEditTime;
+
     @Ignore
     public LoginInfo(String username, String password, int iconResourceId) {
         this.username = username;
         this.password = password;
         this.iconResourceId = iconResourceId;
+        this.lastEditTime = Calendar.getInstance().getTimeInMillis();
     }
 
-    public LoginInfo(long id, String username, String password, int iconResourceId) {
+    public LoginInfo(long id, String username, String password, int iconResourceId,
+            long lastEditTime) {
         this(username, password, iconResourceId);
         this.id = id;
+        this.lastEditTime = lastEditTime;
     }
 
     public long getId() {
@@ -63,6 +72,14 @@ public class LoginInfo {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public long getLastEditTime() {
+        return lastEditTime;
+    }
+
+    public void setLastEditTime(long time) {
+        this.lastEditTime = time;
     }
 
     @Override

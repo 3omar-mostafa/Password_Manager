@@ -1,6 +1,8 @@
 package com.hafez.password_manager;
 
 import android.os.Bundle;
+import android.text.format.DateUtils;
+import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewParent;
 import android.widget.EditText;
@@ -15,6 +17,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.hafez.password_manager.databinding.ActivityAddEditLoginInfoBinding;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
+import java.text.DateFormat;
+import java.util.Calendar;
 
 public class AddEditLoginInfoActivity extends AppCompatActivity {
 
@@ -70,8 +74,22 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         viewBinding.username.setText(loginInfo.getUsername());
         viewBinding.password.setText(loginInfo.getPassword());
 
+        viewBinding.lastEdited.setVisibility(View.VISIBLE);
+        viewBinding.lastEdited.setText(getFormattedDateTime(loginInfo.getLastEditTime()));
+
         viewBinding.username.clearFocus();
         viewBinding.password.clearFocus();
+    }
+
+    protected static String getFormattedDateTime(long time) {
+
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+
+        return String.format("%s :\n%s\n%s",
+                App.getInstance().getString(R.string.last_edited),
+                DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(time),
+                DateUtils.getRelativeTimeSpanString(time, currentTime, DateUtils.MINUTE_IN_MILLIS)
+        );
     }
 
     protected void initializeViews() {
