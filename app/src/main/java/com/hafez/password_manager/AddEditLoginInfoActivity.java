@@ -2,12 +2,15 @@ package com.hafez.password_manager;
 
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewParent;
 import android.widget.EditText;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog.Builder;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,6 +22,7 @@ import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class AddEditLoginInfoActivity extends AppCompatActivity {
 
@@ -106,18 +110,22 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         viewBinding.password.setOnFocusChangeListener(focusChangeListener);
 
         viewBinding.save.setOnClickListener(v -> {
-            if (isInputValid()) {
-                saveLoginInfo();
-                finish();
-            } else {
-                showSavingErrors();
-            }
+            checkInputAndSave();
         });
 
     }
 
     protected boolean isInputValid() {
         return isValidTextInput(viewBinding.username) && isValidTextInput(viewBinding.password);
+    }
+
+    private void checkInputAndSave() {
+        if (isInputValid()) {
+            saveLoginInfo();
+            finish();
+        } else {
+            showSavingErrors();
+        }
     }
 
     protected void showSavingErrors() {
@@ -187,5 +195,61 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
             throw new IllegalStateException("Parent View Must be TextInputLayout");
         }
         return inputLayout;
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (userMadeChanges()) {
+            showSaveOrDiscardDialog();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == android.R.id.home) {
+            if (userMadeChanges()) {
+                showSaveOrDiscardDialog();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showSaveOrDiscardDialog() {
+        new Builder(this)
+                .setMessage(R.string.unsaved_changes)
+                .setPositiveButton(R.string.save, (dialog, which) -> {
+                    dialog.dismiss();
+                    checkInputAndSave();
+                })
+                .setNegativeButton(R.string.discard, (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
+                })
+                .create()
+                .show();
+    }
+
+    @Nullable
+    private static String getString(@NonNull EditText editText) {
+        return editText.getText() == null ? null : editText.getText().toString();
+    }
+
+    protected boolean userMadeChanges() {
+
+        if (mode == Modes.ADD) {
+            return isValidTextInput(viewBinding.username) || isValidTextInput(viewBinding.password);
+        } else {
+            assert viewModel.getLoginInfo() != null;
+            LoginInfo loginInfo = viewModel.getLoginInfo().getValue();
+            assert loginInfo != null;
+
+            return !(Objects.equals(loginInfo.getUsername(), getString(viewBinding.username)) &&
+                    Objects.equals(loginInfo.getPassword(), getString(viewBinding.password)));
+        }
     }
 }
