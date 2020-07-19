@@ -8,12 +8,14 @@ import static org.junit.Assert.assertEquals;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import androidx.annotation.IdRes;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
@@ -57,6 +59,14 @@ public class EditLoginInfoActivityTest {
                     // Delay finish to have time to make some checks on activity
                     new Handler().postDelayed(super::finish, 3000);
                 }
+
+                @Override
+                public boolean onSupportNavigateUp() {
+                    // Delay finish to have time to make some checks on activity
+                    new Handler().postDelayed(super::onSupportNavigateUp, 3000);
+
+                    return true;
+                }
             };
         }
     };
@@ -70,6 +80,13 @@ public class EditLoginInfoActivityTest {
     private Context context;
     private AddEditLoginInfoActivity activity;
     private LoginInfo initialLoginInfo;
+    long initialDatabaseSize;
+
+    private static final String newUsername = "new_username";
+    private static final String newPassword = "new_password";
+
+    private static final int DIALOG_SAVE_BUTTON = android.R.id.button1;
+    private static final int DIALOG_DISCARD_BUTTON = android.R.id.button2;
 
     @Before
     public void init() {
@@ -81,6 +98,7 @@ public class EditLoginInfoActivityTest {
         repository = new DatabaseRepository(loginInfoDao);
 
         repository.insert(initialLoginInfo);
+        initialDatabaseSize = getLoginInfoTableSize();
 
         Intent intent = new Intent(context, AddEditLoginInfoActivity.class);
         intent.putExtra(AddEditLoginInfoActivity.ARGUMENT_LOGIN_INFO_ID, initialLoginInfo.getId());
@@ -96,6 +114,11 @@ public class EditLoginInfoActivityTest {
         }
     }
 
+    @After
+    public void checkDatabaseSizeNotChanged() {
+        long currentLoginInfoTableSize = getLoginInfoTableSize();
+        assertEquals(initialDatabaseSize, currentLoginInfoTableSize);
+    }
 
     @Test
     public void initialDataLoadedSuccessfullyTest() {
@@ -115,11 +138,8 @@ public class EditLoginInfoActivityTest {
     @Test
     public void updateUsernameTest() {
 
-        String newUsername = "new_username";
-
         onView(ViewMatchers.withId(R.id.username))
-                .perform(ViewActions.clearText())
-                .perform(ViewActions.typeText(newUsername));
+                .perform(ViewActions.replaceText(newUsername));
 
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
@@ -133,11 +153,8 @@ public class EditLoginInfoActivityTest {
     @Test
     public void updatePasswordTest() {
 
-        String newPassword = "new_password";
-
         onView(ViewMatchers.withId(R.id.password))
-                .perform(ViewActions.clearText())
-                .perform(ViewActions.typeText(newPassword));
+                .perform(ViewActions.replaceText(newPassword));
 
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
@@ -150,16 +167,11 @@ public class EditLoginInfoActivityTest {
     @Test
     public void updateUsernameAndPasswordTest() {
 
-        String newUsername = "new_username";
-        String newPassword = "new_password";
-
         onView(ViewMatchers.withId(R.id.username))
-                .perform(ViewActions.clearText())
-                .perform(ViewActions.typeText(newUsername));
+                .perform(ViewActions.replaceText(newUsername));
 
         onView(ViewMatchers.withId(R.id.password))
-                .perform(ViewActions.clearText())
-                .perform(ViewActions.typeText(newPassword));
+                .perform(ViewActions.replaceText(newPassword));
 
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
@@ -177,32 +189,11 @@ public class EditLoginInfoActivityTest {
 
         assertNoErrors();
 
-        assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(),
-                initialLoginInfo.getPassword());
-    }
-
-    @Test
-    public void pressBackWithNoChangesTest() {
-
-        Espresso.pressBackUnconditionally();
-
-        assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(),
-                initialLoginInfo.getPassword());
-    }
-
-    @Test
-    public void pressUpWithNoChangesTest() {
-
-        onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
-                .perform(ViewActions.click());
-
-        assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(),
-                initialLoginInfo.getPassword());
+        assertDatabaseNotChanged();
     }
 
     @Test
     public void updateInvalidInputTest() {
-        long initialDatabaseSize = getLoginInfoTableSize();
 
         onView(ViewMatchers.withId(R.id.username))
                 .perform(ViewActions.clearText());
@@ -213,6 +204,10 @@ public class EditLoginInfoActivityTest {
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
 
+        checkFailedToUpdate_InvalidUsernameAndPassword();
+    }
+
+    private void checkFailedToUpdate_InvalidUsernameAndPassword() {
         String error = context.getString(R.string.error_text);
 
         onView(ViewMatchers.withId(R.id.username))
@@ -227,14 +222,12 @@ public class EditLoginInfoActivityTest {
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
-        long currentDatabaseSize = getLoginInfoTableSize();
-        assertEquals(initialDatabaseSize, currentDatabaseSize);
+        assertDatabaseNotChanged();
     }
 
 
     @Test
     public void updateInvalidUsernameTest() {
-        long initialDatabaseSize = getLoginInfoTableSize();
 
         onView(ViewMatchers.withId(R.id.username))
                 .perform(ViewActions.clearText());
@@ -242,6 +235,10 @@ public class EditLoginInfoActivityTest {
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
 
+        checkFailedToUpdate_InvalidUsername();
+    }
+
+    private void checkFailedToUpdate_InvalidUsername() {
         String error = context.getString(R.string.error_text);
         onView(ViewMatchers.withId(R.id.username))
                 .check(matches(CustomViewMatchers.parentHasErrorText(error)));
@@ -255,14 +252,12 @@ public class EditLoginInfoActivityTest {
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
-        long currentDatabaseSize = getLoginInfoTableSize();
-        assertEquals(initialDatabaseSize, currentDatabaseSize);
+        assertDatabaseNotChanged();
     }
 
 
     @Test
     public void updateInvalidPasswordTest() {
-        long initialDatabaseSize = getLoginInfoTableSize();
 
         onView(ViewMatchers.withId(R.id.password))
                 .perform(ViewActions.clearText());
@@ -270,6 +265,10 @@ public class EditLoginInfoActivityTest {
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
 
+        checkFailedToUpdate_InvalidPassword();
+    }
+
+    private void checkFailedToUpdate_InvalidPassword() {
         String error = context.getString(R.string.error_text);
         onView(ViewMatchers.withId(R.id.password))
                 .check(matches(CustomViewMatchers.parentHasErrorText(error)));
@@ -283,8 +282,312 @@ public class EditLoginInfoActivityTest {
 
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
-        long currentDatabaseSize = getLoginInfoTableSize();
-        assertEquals(initialDatabaseSize, currentDatabaseSize);
+        assertDatabaseNotChanged();
+    }
+
+
+    private void pressBackAndCheckDialogIsDisplayedAndClick(@IdRes int button) {
+        Espresso.closeSoftKeyboard();
+
+        Espresso.pressBackUnconditionally();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes)).inRoot(RootMatchers.isDialog())
+                .check(matches(ViewMatchers.isDisplayed()));
+
+        onView(ViewMatchers.withId(button)).inRoot(RootMatchers.isDialog())
+                .perform(ViewActions.click());
+    }
+
+
+    private void pressUpAndCheckDialogIsDisplayedAndClick(@IdRes int button) {
+        Espresso.closeSoftKeyboard();
+
+        onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                .perform(ViewActions.click());
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes)).inRoot(RootMatchers.isDialog())
+                .check(matches(ViewMatchers.isDisplayed()));
+
+        onView(ViewMatchers.withId(button)).inRoot(RootMatchers.isDialog())
+                .perform(ViewActions.click());
+    }
+
+    @Test
+    public void pressBack_UpdatedUsername_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        assertNoErrors();
+
+        assertDatabaseEquals(initialLoginInfo.getId(), newUsername, initialLoginInfo.getPassword());
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_UpdatedUsername_Save_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_UpdatedUsername_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        assertNoErrors();
+
+        assertDatabaseEquals(initialLoginInfo.getId(), newUsername, initialLoginInfo.getPassword());
+    }
+
+    @Test
+    public void pressBack_UpdatedUsername_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_UpdatedUsername_Discard_Test} with changing back button to
+     * up button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_UpdatedUsername_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
+    }
+
+
+    @Test
+    public void pressBack_DeletedUsername_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText());
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidUsername();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_DeletedUsername_Save_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_DeletedUsername_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText());
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidUsername();
+    }
+
+
+    @Test
+    public void pressBack_UpdatedPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        assertNoErrors();
+
+        assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(), newPassword);
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_UpdatedPassword_Save_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_UpdatedPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        assertNoErrors();
+
+        assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(), newPassword);
+    }
+
+    @Test
+    public void pressBack_UpdatedPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_UpdatedPassword_Discard_Test} with changing back button to
+     * up button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_UpdatedPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
+    }
+
+    @Test
+    public void pressBack_DeletedPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText());
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidPassword();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_DeletedPassword_Save_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_DeletedPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText());
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidPassword();
+    }
+
+
+    @Test
+    public void pressBack_UpdatedUsernameAndPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        assertNoErrors();
+
+        assertDatabaseEquals(initialLoginInfo.getId(), newUsername, newPassword);
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_UpdatedUsernameAndPassword_Save_Test} with changing back
+     * button to up button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_UpdatedUsernameAndPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        assertNoErrors();
+
+        assertDatabaseEquals(initialLoginInfo.getId(), newUsername, newPassword);
+    }
+
+    @Test
+    public void pressBack_UpdatedUsernameAndPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_UpdatedUsernameAndPassword_Discard_Test} with changing back
+     * button to up button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_UpdatedUsernameAndPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
+    }
+
+
+    @Test
+    public void pressBack_DeletedUsernameAndPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText());
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText());
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidUsernameAndPassword();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_DeletedUsernameAndPassword_Save_Test} with changing back
+     * button to up button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_DeletedUsernameAndPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText());
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText());
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidUsernameAndPassword();
+    }
+
+
+    @Test
+    public void pressBack_NoChanges_Test() {
+        Espresso.closeSoftKeyboard();
+
+        Espresso.pressBackUnconditionally();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+
+        assertDatabaseNotChanged();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_NoChanges_Test} with changing back button to up button
+     * because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_NoChanges_Test() {
+        onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                .perform(ViewActions.click());
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+
+        assertDatabaseNotChanged();
     }
 
 
@@ -298,6 +601,16 @@ public class EditLoginInfoActivityTest {
 
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(doesNotExist());
+    }
+
+
+    private void assertDatabaseNotChanged() {
+        long currentLoginInfoTableSize = getLoginInfoTableSize();
+
+        assertEquals(initialDatabaseSize, currentLoginInfoTableSize);
+
+        assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(),
+                initialLoginInfo.getPassword());
     }
 
     private void assertDatabaseEquals(long id, String username, String password) {

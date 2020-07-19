@@ -8,15 +8,19 @@ import static org.junit.Assert.assertEquals;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.MonitoringInstrumentation;
 import androidx.test.runner.intercepting.SingleActivityFactory;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
 import com.hafez.password_manager.database.DatabaseTestUtils;
@@ -61,6 +65,14 @@ public class AddLoginInfoActivityTest {
                     // Delay finish to have time to make some checks on activity
                     new Handler().postDelayed(super::finish, 3000);
                 }
+
+                @Override
+                public boolean onSupportNavigateUp() {
+                    // Delay finish to have time to make some checks on activity
+                    new Handler().postDelayed(super::onSupportNavigateUp, 3000);
+
+                    return true;
+                }
             };
         }
     };
@@ -73,6 +85,12 @@ public class AddLoginInfoActivityTest {
     private LoginInfoRepository repository;
     private Context context;
     private AddEditLoginInfoActivity activity;
+
+    private static final String sampleUsername = "sample_username";
+    private static final String samplePassword = "sample_password";
+
+    private static final int DIALOG_SAVE_BUTTON = android.R.id.button1;
+    private static final int DIALOG_DISCARD_BUTTON = android.R.id.button2;
 
     @Before
     public void init() {
@@ -109,9 +127,6 @@ public class AddLoginInfoActivityTest {
     @Test
     public void successfulInsertionTest() {
 
-        String sampleUsername = "sample_username";
-        String samplePassword = "sample_password";
-
         onView(ViewMatchers.withId(R.id.username))
                 .perform(ViewActions.typeText(sampleUsername));
 
@@ -121,6 +136,10 @@ public class AddLoginInfoActivityTest {
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
 
+        checkValidInsertionToDatabase();
+    }
+
+    private void checkValidInsertionToDatabase() {
         onView(ViewMatchers.withId(R.id.username))
                 .check(matches(CustomViewMatchers.parentHasNoErrorText()));
 
@@ -172,11 +191,15 @@ public class AddLoginInfoActivityTest {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(ViewMatchers.withId(R.id.password))
-                .perform(ViewActions.typeText("password"));
+                .perform(ViewActions.typeText(samplePassword));
 
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
 
+        checkFailedToInsert_InvalidUsername();
+    }
+
+    private void checkFailedToInsert_InvalidUsername() {
         String error = context.getString(R.string.error_text);
         onView(ViewMatchers.withId(R.id.username))
                 .check(matches(CustomViewMatchers.parentHasErrorText(error)));
@@ -199,11 +222,15 @@ public class AddLoginInfoActivityTest {
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
 
         onView(ViewMatchers.withId(R.id.username))
-                .perform(ViewActions.typeText("username"));
+                .perform(ViewActions.typeText(sampleUsername));
 
         onView(ViewMatchers.withId(R.id.save))
                 .perform(ViewActions.click());
 
+        checkFailedToInsert_InvalidPassword();
+    }
+
+    private void checkFailedToInsert_InvalidPassword() {
         String error = context.getString(R.string.error_text);
         onView(ViewMatchers.withId(R.id.password))
                 .check(matches(CustomViewMatchers.parentHasErrorText(error)));
@@ -218,6 +245,252 @@ public class AddLoginInfoActivityTest {
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    private void pressBackAndCheckDialogIsDisplayedAndClick(@IdRes int button) {
+        Espresso.closeSoftKeyboard();
+
+        Espresso.pressBackUnconditionally();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes)).inRoot(RootMatchers.isDialog())
+                .check(matches(ViewMatchers.isDisplayed()));
+
+        onView(ViewMatchers.withId(button)).inRoot(RootMatchers.isDialog())
+                .perform(ViewActions.click());
+    }
+
+
+    private void pressUpAndCheckDialogIsDisplayedAndClick(@IdRes int button) {
+        Espresso.closeSoftKeyboard();
+
+        onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                .perform(ViewActions.click());
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes)).inRoot(RootMatchers.isDialog())
+                .check(matches(ViewMatchers.isDisplayed()));
+
+        onView(ViewMatchers.withId(button)).inRoot(RootMatchers.isDialog())
+                .perform(ViewActions.click());
+    }
+
+    @Test
+    public void pressBack_AddedUsername_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToInsert_InvalidPassword();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_AddedUsername_Save_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_AddedUsername_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToInsert_InvalidPassword();
+    }
+
+    @Test
+    public void pressBack_AddedUsername_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_AddedUsername_Discard_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_AddedUsername_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    @Test
+    public void pressBack_AddedPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToInsert_InvalidUsername();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_AddedPassword_Save_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_AddedPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToInsert_InvalidUsername();
+    }
+
+    @Test
+    public void pressBack_AddedPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_AddedPassword_Discard_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_AddedPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+
+    @Test
+    public void pressBack_AddedUsernameAndPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkValidInsertionToDatabase();
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_AddedUsernameAndPassword_Save_Test} with changing back
+     * button to up button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_AddedUsernameAndPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkValidInsertionToDatabase();
+    }
+
+    @Test
+    public void pressBack_AddedUsernameAndPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_AddedUsernameAndPassword_Discard_Test} with changing back
+     * button to up button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_AddedUsernameAndPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    @Test
+    public void pressBack_NoChanges_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername))
+                .perform(ViewActions.clearText());
+
+        Espresso.closeSoftKeyboard();
+
+        Espresso.pressBackUnconditionally();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_NoChanges_Test} with changing back button to up button
+     * because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_NoChanges_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername))
+                .perform(ViewActions.clearText());
+
+        onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                .perform(ViewActions.click());
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+    }
+
+
+    @Test
+    public void pressBack_AddedWhitespaces_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText("  "));
+
+        Espresso.closeSoftKeyboard();
+
+        Espresso.pressBackUnconditionally();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+
+    }
+
+    /**
+     * Duplicated from {@link #pressBack_AddedWhitespaces_Test} with changing back button to up
+     * button because Android Test Orchestrator does not support parameterized tests
+     */
+    @Test
+    public void pressUp_AddedWhitespaces_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText("  "));
+
+        onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                .perform(ViewActions.click());
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+
     }
 
 
