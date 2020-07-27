@@ -6,24 +6,24 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
 import com.hafez.password_manager.LiveDataUtils;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.List;
 
 public class DatabaseTestUtils {
 
     public static void assertThatLoginInfoTableIsEmpty(LoginInfoRepository repository) {
-        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        LiveData<List<LoginInfoFull>> liveData = repository.getAllLoginInfoList();
 
-        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
+        List<LoginInfoFull> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
         assertTrue(loginInfoList.isEmpty());
     }
 
     public static long getLoginInfoTableSize(LoginInfoRepository repository) {
-        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        LiveData<List<LoginInfoFull>> liveData = repository.getAllLoginInfoList();
 
-        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
+        List<LoginInfoFull> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
         return loginInfoList.size();
     }

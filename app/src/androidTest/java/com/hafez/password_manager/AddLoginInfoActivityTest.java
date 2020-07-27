@@ -20,12 +20,11 @@ import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.MonitoringInstrumentation;
 import androidx.test.runner.intercepting.SingleActivityFactory;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
 import com.hafez.password_manager.database.DatabaseTestUtils;
 import com.hafez.password_manager.database.LoginInfoDao;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
@@ -149,12 +148,12 @@ public class AddLoginInfoActivityTest {
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
                 .check(doesNotExist());
 
-        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        LiveData<List<LoginInfoFull>> liveData = repository.getAllLoginInfoList();
 
-        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
+        List<LoginInfoFull> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
         assertEquals(1, loginInfoList.size());
-        LoginInfo loginInfo = loginInfoList.get(0);
+        LoginInfoFull loginInfo = loginInfoList.get(0);
         assertEquals(1, loginInfo.getId());
         assertEquals(sampleUsername, loginInfo.getUsername());
         assertEquals(samplePassword, loginInfo.getPassword());

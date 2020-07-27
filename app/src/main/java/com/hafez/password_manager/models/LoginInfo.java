@@ -14,21 +14,21 @@ public class LoginInfo {
     public static final long INVALID_ID = 0;
 
     @PrimaryKey(autoGenerate = true)
-    private long id = INVALID_ID;
+    long id = INVALID_ID;
 
     @DrawableRes
-    private int iconResourceId;
+    int iconResourceId;
 
     @NonNull
-    private String username;
+    String username;
 
     @NonNull
-    private String password;
+    String password;
 
     /**
      * Time represented as number of milliseconds since the epoch, January 1, 1970, 00:00:00 GMT.
      */
-    private long lastEditTime;
+    long lastEditTime;
 
     @Ignore
     public LoginInfo(@NonNull String username, @NonNull String password,

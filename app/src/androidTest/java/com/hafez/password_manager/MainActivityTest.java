@@ -25,7 +25,7 @@ import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
 import com.hafez.password_manager.database.DatabaseTestUtils;
 import com.hafez.password_manager.database.LoginInfoDao;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import com.hafez.password_manager.view_models.LoginInfoViewModel;
@@ -69,7 +69,7 @@ public class MainActivityTest {
         int size = 15;
 
         for (int i = 0; i < size; i++) {
-            repository.insert(new LoginInfo("username#" + i, "password#" + i,
+            repository.insert(new LoginInfoFull("username#" + i, "password#" + i,
                     R.drawable.ic_launcher));
         }
 
@@ -84,11 +84,11 @@ public class MainActivityTest {
     }
 
 
-    private List<LoginInfo> getLoginInfoListFromDatabase() {
+    private List<LoginInfoFull> getLoginInfoListFromDatabase() {
         InstantTaskExecutorUtils.turnOn();
 
-        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
-        List<LoginInfo> list = LiveDataUtils.getValueOf(liveData);
+        LiveData<List<LoginInfoFull>> liveData = repository.getAllLoginInfoList();
+        List<LoginInfoFull> list = LiveDataUtils.getValueOf(liveData);
 
         InstantTaskExecutorUtils.turnOff();
 
@@ -96,7 +96,7 @@ public class MainActivityTest {
     }
 
     private LoginInfoRepository repository;
-    private List<LoginInfo> initialLoginInfoDatabaseList;
+    private List<LoginInfoFull> initialLoginInfoDatabaseList;
     private MainActivity activity;
 
     private CountingIdlingResource idlingResource = new CountingIdlingResource("Test");
@@ -178,7 +178,7 @@ public class MainActivityTest {
         onView(ViewMatchers.withId(R.id.login_info_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(position, swipeAction));
 
-        List<LoginInfo> loginInfoList = getLoginInfoListFromDatabase();
+        List<LoginInfoFull> loginInfoList = getLoginInfoListFromDatabase();
 
         assertEquals(initialLoginInfoDatabaseList.size() - 1, loginInfoList.size());
         assertFalse(loginInfoList.contains(initialLoginInfoDatabaseList.get(position)));
@@ -218,7 +218,7 @@ public class MainActivityTest {
         onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_action))
                 .perform(ViewActions.click());
 
-        List<LoginInfo> loginInfoList = getLoginInfoListFromDatabase();
+        List<LoginInfoFull> loginInfoList = getLoginInfoListFromDatabase();
 
         assertEquals(initialLoginInfoDatabaseList.size(), loginInfoList.size());
         assertTrue(loginInfoList.contains(initialLoginInfoDatabaseList.get(position)));

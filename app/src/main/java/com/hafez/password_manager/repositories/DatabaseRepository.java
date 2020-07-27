@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import com.hafez.password_manager.App;
 import com.hafez.password_manager.database.AppDatabase;
 import com.hafez.password_manager.database.LoginInfoDao;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -23,17 +23,17 @@ public class DatabaseRepository implements LoginInfoRepository {
     }
 
     @Override
-    public void insert(LoginInfo loginInfo) {
+    public void insert(LoginInfoFull loginInfo) {
         databaseExecutor.execute(() -> dao.insert(loginInfo));
     }
 
     @Override
-    public void update(LoginInfo loginInfo) {
+    public void update(LoginInfoFull loginInfo) {
         databaseExecutor.execute(() -> dao.update(loginInfo));
     }
 
     @Override
-    public void delete(LoginInfo loginInfo) {
+    public void delete(LoginInfoFull loginInfo) {
         databaseExecutor.execute(() -> dao.delete(loginInfo));
     }
 
@@ -43,12 +43,12 @@ public class DatabaseRepository implements LoginInfoRepository {
     }
 
     @Override
-    public LiveData<List<LoginInfo>> getAllLoginInfoList() {
+    public LiveData<List<LoginInfoFull>> getAllLoginInfoList() {
         return dao.getLoginInfoList();
     }
 
     @Override
-    public LiveData<LoginInfo> getLoginInfo(long id) {
+    public LiveData<LoginInfoFull> getLoginInfo(long id) {
         return dao.getLoginInfo(id);
     }
 

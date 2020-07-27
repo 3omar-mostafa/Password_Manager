@@ -19,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hafez.password_manager.databinding.ActivityAddEditLoginInfoBinding;
 import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -49,7 +50,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
 
         viewModel = getViewModel(new AddEditLoginInfoViewModel.Factory(id));
 
-        LiveData<LoginInfo> loginInfoData = viewModel.getLoginInfo();
+        LiveData<LoginInfoFull> loginInfoData = viewModel.getLoginInfo();
 
         if (mode == Modes.EDIT) {
             setTitle(R.string.edit_login_info);
@@ -74,7 +75,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         return new ViewModelProvider(this, factory).get(AddEditLoginInfoViewModel.class);
     }
 
-    protected void bindViewsWithData(@NonNull LoginInfo loginInfo) {
+    protected void bindViewsWithData(@NonNull LoginInfoFull loginInfo) {
         viewBinding.username.setText(loginInfo.getUsername());
         viewBinding.password.setText(loginInfo.getPassword());
 
@@ -155,7 +156,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         String username = viewBinding.username.getText().toString();
         String password = viewBinding.password.getText().toString();
 
-        LoginInfo loginInfo = new LoginInfo(username, password, R.drawable.ic_launcher);
+        LoginInfoFull loginInfo = new LoginInfoFull(username, password, R.drawable.ic_launcher);
         viewModel.insertOrUpdateLoginInfo(loginInfo);
     }
 
@@ -245,7 +246,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
             return isValidTextInput(viewBinding.username) || isValidTextInput(viewBinding.password);
         } else {
             assert viewModel.getLoginInfo() != null;
-            LoginInfo loginInfo = viewModel.getLoginInfo().getValue();
+            LoginInfoFull loginInfo = viewModel.getLoginInfo().getValue();
             assert loginInfo != null;
 
             return !(Objects.equals(loginInfo.getUsername(), getString(viewBinding.username)) &&

@@ -4,14 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.List;
 
 public class LoginInfoViewModel extends ViewModel {
 
-    private LiveData<List<LoginInfo>> loginInfoList;
+    private LiveData<List<LoginInfoFull>> loginInfoList;
     private LoginInfoRepository repository;
 
     public LoginInfoViewModel(@NonNull LoginInfoRepository repository) {
@@ -19,16 +19,16 @@ public class LoginInfoViewModel extends ViewModel {
         this.loginInfoList = repository.getAllLoginInfoList();
     }
 
-    public LiveData<List<LoginInfo>> getLoginInfoLiveDataList() {
+    public LiveData<List<LoginInfoFull>> getLoginInfoLiveDataList() {
         return loginInfoList;
     }
 
-    public void deleteLoginInfo(LoginInfo loginInfo) {
+    public void deleteLoginInfo(LoginInfoFull loginInfo) {
         repository.delete(loginInfo);
     }
 
 
-    public void insertLoginInfo(LoginInfo loginInfo) {
+    public void insertLoginInfo(LoginInfoFull loginInfo) {
         repository.insert(loginInfo);
     }
 

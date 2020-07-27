@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.hafez.password_manager.databinding.ActivityMainBinding;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.view_models.LoginInfoViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onSwiped(@NonNull ViewHolder viewHolder, int direction) {
-            LoginInfo loginInfo = adapter.getCurrentList().get(viewHolder.getAdapterPosition());
+            LoginInfoFull loginInfo = adapter.getCurrentList().get(viewHolder.getAdapterPosition());
             viewModel.deleteLoginInfo(loginInfo);
 
             Snackbar.make(snackbarAnchorView, R.string.item_deleted_successfully, 10_000)

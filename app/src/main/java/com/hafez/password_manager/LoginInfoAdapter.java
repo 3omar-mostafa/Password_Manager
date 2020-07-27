@@ -8,19 +8,19 @@ import androidx.recyclerview.widget.DiffUtil.ItemCallback;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import com.hafez.password_manager.databinding.LoginInfoListItemBinding;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.LoginInfoAdapter.LoginInfoViewHolder;
 
-public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder> {
+public class LoginInfoAdapter extends ListAdapter<LoginInfoFull, LoginInfoViewHolder> {
 
-    private static ItemCallback<LoginInfo> DIFF_CALLBACK = new ItemCallback<LoginInfo>() {
+    private static ItemCallback<LoginInfoFull> DIFF_CALLBACK = new ItemCallback<LoginInfoFull>() {
         @Override
-        public boolean areItemsTheSame(@NonNull LoginInfo oldItem, @NonNull LoginInfo newItem) {
+        public boolean areItemsTheSame(@NonNull LoginInfoFull oldItem, @NonNull LoginInfoFull newItem) {
             return oldItem.getId() == newItem.getId();
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull LoginInfo oldItem, @NonNull LoginInfo newItem) {
+        public boolean areContentsTheSame(@NonNull LoginInfoFull oldItem, @NonNull LoginInfoFull newItem) {
             return oldItem.equals(newItem);
         }
     };
@@ -45,7 +45,7 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull LoginInfoViewHolder holder, int position) {
-        LoginInfo loginInfo = getItem(position);
+        LoginInfoFull loginInfo = getItem(position);
         holder.bind(loginInfo);
     }
 
@@ -69,7 +69,7 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder
 
         }
 
-        void bind(@NonNull LoginInfo loginInfo) {
+        void bind(@NonNull LoginInfoFull loginInfo) {
             viewBinding.icon.setImageResource(loginInfo.getIconResourceId());
             viewBinding.username.setText(loginInfo.getUsername());
             viewBinding.password.setText(loginInfo.getPassword());
@@ -79,7 +79,7 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfo, LoginInfoViewHolder
 
     public interface OnItemClickListener {
 
-        void onItemClick(View view, @NonNull LoginInfo loginInfo);
+        void onItemClick(View view, @NonNull LoginInfoFull loginInfo);
     }
 
 }

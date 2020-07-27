@@ -11,7 +11,7 @@ import androidx.lifecycle.LiveData;
 import com.hafez.password_manager.LiveDataUtils;
 import com.hafez.password_manager.R;
 import com.hafez.password_manager.mock.MockRepository;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class AddLoginInfoViewModelTest {
 
     private AddEditLoginInfoViewModel viewModel;
 
-    private List<LoginInfo> loginInfoExpectedList;
+    private List<LoginInfoFull> loginInfoExpectedList;
     private LoginInfoRepository repository;
 
     @Before
@@ -50,9 +50,9 @@ public class AddLoginInfoViewModelTest {
 
         loginInfoExpectedList = new ArrayList<>();
 
-        loginInfoExpectedList.add(new LoginInfo(1, "user_1", "pass_1", R.drawable.ic_launcher));
-        loginInfoExpectedList.add(new LoginInfo(2, "user_2", "pass_2", R.drawable.ic_launcher));
-        loginInfoExpectedList.add(new LoginInfo(3, "user_2", "pass_3", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfoFull(1, "user_1", "pass_1", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfoFull(2, "user_2", "pass_2", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfoFull(3, "user_2", "pass_3", R.drawable.ic_launcher));
 
         return new MockRepository(loginInfoExpectedList);
     }
@@ -60,13 +60,13 @@ public class AddLoginInfoViewModelTest {
 
     @Test
     public void insertLoginInfoTest() {
-        LoginInfo newData = new LoginInfo("new_user", "new_pass", 0);
+        LoginInfoFull newData = new LoginInfoFull("new_user", "new_pass", 0);
         newData.setId(loginInfoExpectedList.size() + 1);
 
         viewModel.insertOrUpdateLoginInfo(newData);
 
-        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
-        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
+        LiveData<List<LoginInfoFull>> liveData = repository.getAllLoginInfoList();
+        List<LoginInfoFull> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
         assertNotNull(loginInfoList);
         assertFalse(loginInfoList.isEmpty());
@@ -76,13 +76,13 @@ public class AddLoginInfoViewModelTest {
 
     @Test
     public void deleteUnExistingLoginInfoTest() {
-        LoginInfo unExistingElement = new LoginInfo("does_not_exist", "does_not_exist", 0);
+        LoginInfoFull unExistingElement = new LoginInfoFull("does_not_exist", "does_not_exist", 0);
         unExistingElement.setId(loginInfoExpectedList.size() + 1);
 
         viewModel.deleteLoginInfo(unExistingElement);
 
-        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
-        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
+        LiveData<List<LoginInfoFull>> liveData = repository.getAllLoginInfoList();
+        List<LoginInfoFull> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
         assertNotNull(loginInfoList);
         assertFalse(loginInfoList.isEmpty());
@@ -92,7 +92,7 @@ public class AddLoginInfoViewModelTest {
 
     @Test
     public void getLoginInfoTest() {
-        LiveData<LoginInfo> loginInfo = viewModel.getLoginInfo();
+        LiveData<LoginInfoFull> loginInfo = viewModel.getLoginInfo();
         assertNull(loginInfo);
     }
 }

@@ -22,7 +22,7 @@ import androidx.test.runner.intercepting.SingleActivityFactory;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
 import com.hafez.password_manager.database.DatabaseTestUtils;
 import com.hafez.password_manager.database.LoginInfoDao;
-import com.hafez.password_manager.models.LoginInfo;
+import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
@@ -79,7 +79,7 @@ public class EditLoginInfoActivityTest {
     private LoginInfoRepository repository;
     private Context context;
     private AddEditLoginInfoActivity activity;
-    private LoginInfo initialLoginInfo;
+    private LoginInfoFull initialLoginInfo;
     long initialDatabaseSize;
 
     private static final String newUsername = "new_username";
@@ -92,7 +92,7 @@ public class EditLoginInfoActivityTest {
     public void init() {
         context = ApplicationProvider.getApplicationContext();
 
-        initialLoginInfo = new LoginInfo(1, "old_username", "old_password", 0);
+        initialLoginInfo = new LoginInfoFull(1, "old_username", "old_password", 0);
 
         LoginInfoDao loginInfoDao = DatabaseTestUtils.getInMemoryDatabase().getLoginInfoDao();
         repository = new DatabaseRepository(loginInfoDao);
@@ -618,12 +618,12 @@ public class EditLoginInfoActivityTest {
 
         final int databaseSize = 1;
 
-        LiveData<List<LoginInfo>> liveData = repository.getAllLoginInfoList();
+        LiveData<List<LoginInfoFull>> liveData = repository.getAllLoginInfoList();
 
-        List<LoginInfo> loginInfoList = LiveDataUtils.getValueOf(liveData);
+        List<LoginInfoFull> loginInfoList = LiveDataUtils.getValueOf(liveData);
 
         assertEquals(databaseSize, loginInfoList.size());
-        LoginInfo loginInfo = loginInfoList.get(0);
+        LoginInfoFull loginInfo = loginInfoList.get(0);
         assertEquals(id, loginInfo.getId());
         assertEquals(username, loginInfo.getUsername());
         assertEquals(password, loginInfo.getPassword());
