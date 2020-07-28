@@ -58,8 +58,8 @@ public class AddEditLoginInfoViewModel extends ViewModel {
     }
 
     /**
-     * @return The {@link LoginInfoFull} we are editing wrapped in {@link LiveData} object. Return null
-     * if we are creating a new {@link LoginInfoFull}.
+     * @return The {@link LoginInfoFull} we are editing wrapped in {@link LiveData} object. Return
+     * null if we are creating a new {@link LoginInfoFull}.
      */
     @Nullable
     public LiveData<LoginInfoFull> getLoginInfo() {
@@ -72,11 +72,11 @@ public class AddEditLoginInfoViewModel extends ViewModel {
         private long loginInfoId;
 
         /**
-         * Used when updating existing {@link LoginInfoFull}, Or when creating a new {@link LoginInfoFull}
-         * by passing {@link LoginInfoFull#INVALID_ID} id
+         * Used when updating existing {@link LoginInfoFull}, Or when creating a new {@link
+         * LoginInfoFull} by passing {@link LoginInfo#INVALID_ID} id
          *
          * @param loginInfoId The id of the existing {@link LoginInfoFull} object, Or {@link
-         *                    LoginInfoFull#INVALID_ID} to create new {@link LoginInfoFull} object.
+         *                    LoginInfo#INVALID_ID} to create new {@link LoginInfoFull} object.
          */
         public Factory(LoginInfoRepository repository, long loginInfoId) {
             this.repository = repository;
