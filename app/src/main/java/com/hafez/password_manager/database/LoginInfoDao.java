@@ -6,30 +6,32 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
+import com.hafez.password_manager.models.Category;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.models.LoginInfoFull;
 import java.util.List;
 
 @Dao
-public interface LoginInfoDao {
+public abstract class LoginInfoDao {
 
     @Insert(entity = LoginInfo.class,onConflict = OnConflictStrategy.REPLACE)
-    void insert(LoginInfoFull loginInfo);
+    public abstract void insert(LoginInfoFull loginInfo);
 
     @Update(entity = LoginInfo.class)
-    void update(LoginInfoFull loginInfo);
+    public abstract void update(LoginInfoFull loginInfo);
 
     @Delete(entity = LoginInfo.class)
-    void delete(LoginInfoFull loginInfo);
+    public abstract void delete(LoginInfoFull loginInfo);
 
     @Query("DELETE FROM LoginInfo")
-    void deleteAllLoginInfo();
+    public abstract void deleteAllLoginInfo();
 
     @Query("SELECT * FROM LoginInfo")
-    LiveData<List<LoginInfoFull>> getLoginInfoList();
+    public abstract LiveData<List<LoginInfoFull>> getLoginInfoList();
 
     @Query("SELECT * FROM LoginInfo WHERE id = :id")
-    LiveData<LoginInfoFull> getLoginInfo(long id);
+    public abstract LiveData<LoginInfoFull> getLoginInfo(long id);
 
 }
