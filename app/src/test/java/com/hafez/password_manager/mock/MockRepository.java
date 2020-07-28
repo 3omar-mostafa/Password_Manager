@@ -13,30 +13,37 @@ import java.util.List;
 public class MockRepository implements LoginInfoRepository {
 
     private MutableLiveData<List<LoginInfoFull>> database;
-    private List<Category> categoryTable = new ArrayList<>();
+    private MutableLiveData<List<Category>> categoryTable;
 
 
     public MockRepository(@NonNull List<LoginInfoFull> loginInfoList) {
+        categoryTable = new MutableLiveData<>();
         database = new MutableLiveData<>(new ArrayList<>(loginInfoList));
+
+        ArrayList<Category> categories = new ArrayList<>();
         for (LoginInfoFull loginInfo : loginInfoList) {
-            categoryTable.add(loginInfo.getCategory());
+            categories.add(loginInfo.getCategory());
         }
+        categoryTable.setValue(categories);
     }
 
     public MockRepository(@NonNull List<LoginInfoFull> loginInfoList,
             @NonNull List<Category> categoryList) {
         database = new MutableLiveData<>(new ArrayList<>(loginInfoList));
-        categoryTable = new ArrayList<>(categoryList);
+        categoryTable = new MutableLiveData<>();
 
+        ArrayList<Category> categories = new ArrayList<>(categoryList);
         for (LoginInfoFull loginInfo : loginInfoList) {
             if (!doesCategoriesContains(loginInfo.getCategoryName())) {
-                categoryTable.add(loginInfo.getCategory());
+                categories.add(loginInfo.getCategory());
             }
         }
+        categoryTable.setValue(categories);
     }
 
     public MockRepository() {
         database = new MutableLiveData<>(new ArrayList<>());
+        categoryTable = new MutableLiveData<>(new ArrayList<>());
     }
 
 
@@ -104,7 +111,7 @@ public class MockRepository implements LoginInfoRepository {
     }
 
     private boolean doesCategoriesContains(String name) {
-        for (Category category : categoryTable) {
+        for (Category category : categoryTable.getValue()) {
             if (category.getName().equals(name)) {
                 return true;
             }
@@ -153,29 +160,41 @@ public class MockRepository implements LoginInfoRepository {
             updateCategory(category);
             return;
         }
-        categoryTable.add(category);
+        List<Category> categories = categoryTable.getValue();
+        categories.add(category);
+        categoryTable.setValue(new ArrayList<>(categories));
     }
 
     @Override
     public void updateCategory(Category category) {
 
-        for (int i = 0; i < categoryTable.size(); i++) {
-            if (categoryTable.get(i).getName().equals(category.getName())) {
-                categoryTable.remove(i);
-                categoryTable.add(category);
+        List<Category> categories = categoryTable.getValue();
+        for (int i = 0; i < categories.size(); i++) {
+            if (categories.get(i).getName().equals(category.getName())) {
+                categories.remove(i);
+                categories.add(category);
                 break;
             }
         }
+        categoryTable.setValue(new ArrayList<>(categories));
     }
 
     @Override
     public void deleteCategory(Category category) {
 
-        for (int i = 0; i < categoryTable.size(); i++) {
-            if (categoryTable.get(i).getName().equals(category.getName())) {
-                categoryTable.remove(i);
+        List<Category> categories = categoryTable.getValue();
+        for (int i = 0; i < categories.size(); i++) {
+            if (categories.get(i).getName().equals(category.getName())) {
+                categories.remove(i);
                 break;
             }
         }
+        categoryTable.setValue(new ArrayList<>(categories));
     }
+
+    @Override
+    public LiveData<List<Category>> gelAllCategories() {
+        return categoryTable;
+    }
+
 }

@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData;
 import com.hafez.password_manager.App;
 import com.hafez.password_manager.database.AppDatabase;
 import com.hafez.password_manager.database.LoginInfoDao;
-import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.models.Category;
+import com.hafez.password_manager.models.LoginInfoFull;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -66,6 +66,11 @@ public class DatabaseRepository implements LoginInfoRepository {
     @Override
     public void deleteCategory(Category category) {
         databaseExecutor.execute(() -> dao.deleteCategory(category));
+    }
+
+    @Override
+    public LiveData<List<Category>> gelAllCategories() {
+        return dao.getCategoryList();
     }
 
 }

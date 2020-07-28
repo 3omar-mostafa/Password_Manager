@@ -69,4 +69,8 @@ public abstract class LoginInfoDao {
 
     @Delete
     public abstract void deleteCategory(Category category);
+
+    @Query("SELECT * FROM Category")
+    public abstract LiveData<List<Category>> getCategoryList();
+
 }
