@@ -71,7 +71,7 @@ public class DatabaseTest {
 
     @Test
     public void insertTest() {
-        LoginInfoFull loginInfo = new LoginInfoFull("user_1", "pass_1", R.drawable.ic_launcher);
+        LoginInfoFull loginInfo = new LoginInfoFull("user_1", "pass_1");
 
         dao.insert(loginInfo);
 
@@ -131,7 +131,7 @@ public class DatabaseTest {
 
     @Test
     public void updateNotExistingItemTest() {
-        LoginInfoFull newData = new LoginInfoFull("new_name", "new_password", 0);
+        LoginInfoFull newData = new LoginInfoFull("new_name", "new_password");
         newData.setId(sampleData.size() + 1);
 
         dao.update(newData);
@@ -165,7 +165,7 @@ public class DatabaseTest {
 
     @Test
     public void deleteNotExistingItemTest() {
-        LoginInfoFull toBeDeleted = new LoginInfoFull("new_name", "new_password", 0);
+        LoginInfoFull toBeDeleted = new LoginInfoFull("new_name", "new_password");
         toBeDeleted.setId(sampleData.size() + 1);
 
         dao.delete(toBeDeleted);

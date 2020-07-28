@@ -69,8 +69,7 @@ public class MainActivityTest {
         int size = 15;
 
         for (int i = 0; i < size; i++) {
-            repository.insert(new LoginInfoFull("username#" + i, "password#" + i,
-                    R.drawable.ic_launcher));
+            repository.insert(new LoginInfoFull("username#" + i, "password#" + i));
         }
 
         while (true) {

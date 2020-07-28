@@ -3,7 +3,6 @@ package com.hafez.password_manager.models;
 import static androidx.room.ForeignKey.CASCADE;
 import static androidx.room.ForeignKey.SET_NULL;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -40,22 +39,23 @@ public class LoginInfo {
 
     @Ignore
     public LoginInfo(@NonNull String username, @NonNull String password,
-            @DrawableRes int iconResourceId) {
+            @Nullable String categoryName) {
         this.username = username;
         this.password = password;
+        this.categoryName = categoryName;
         this.lastEditTime = Calendar.getInstance().getTimeInMillis();
     }
 
     @Ignore
     public LoginInfo(long id, @NonNull String username, @NonNull String password,
-            @DrawableRes int iconResourceId) {
-        this(username, password, iconResourceId);
+            @Nullable String categoryName) {
+        this(username, password, categoryName);
         this.id = id;
     }
 
     public LoginInfo(long id, @NonNull String username, @NonNull String password,
-            @NonNull String categoryName, long lastEditTime) {
-        this(id ,username, password, 0);
+            @Nullable String categoryName, long lastEditTime) {
+        this(id ,username, password, categoryName);
         this.lastEditTime = lastEditTime;
     }
 

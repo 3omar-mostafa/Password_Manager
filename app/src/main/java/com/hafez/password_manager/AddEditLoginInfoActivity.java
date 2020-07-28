@@ -156,7 +156,7 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         String username = viewBinding.username.getText().toString();
         String password = viewBinding.password.getText().toString();
 
-        LoginInfoFull loginInfo = new LoginInfoFull(username, password, R.drawable.ic_launcher);
+        LoginInfoFull loginInfo = new LoginInfoFull(username, password);
         viewModel.insertOrUpdateLoginInfo(loginInfo);
     }
 

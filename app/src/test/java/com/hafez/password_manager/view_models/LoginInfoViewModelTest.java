@@ -52,7 +52,7 @@ public class LoginInfoViewModelTest {
 
     @Test
     public void insertLoginInfoTest() {
-        LoginInfoFull newData = new LoginInfoFull("new_user", "new_pass", 0);
+        LoginInfoFull newData = new LoginInfoFull("new_user", "new_pass");
         newData.setId(loginInfoExpectedList.size() + 1);
 
         viewModel.insertLoginInfo(newData);

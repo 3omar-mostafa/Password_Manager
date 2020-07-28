@@ -60,7 +60,7 @@ public class AddLoginInfoViewModelTest {
 
     @Test
     public void insertLoginInfoTest() {
-        LoginInfoFull newData = new LoginInfoFull("new_user", "new_pass", 0);
+        LoginInfoFull newData = new LoginInfoFull("new_user", "new_pass");
         newData.setId(loginInfoExpectedList.size() + 1);
 
         viewModel.insertOrUpdateLoginInfo(newData);
@@ -76,7 +76,7 @@ public class AddLoginInfoViewModelTest {
 
     @Test
     public void deleteUnExistingLoginInfoTest() {
-        LoginInfoFull unExistingElement = new LoginInfoFull("does_not_exist", "does_not_exist", 0);
+        LoginInfoFull unExistingElement = new LoginInfoFull("does_not_exist", "does_not_exist");
         unExistingElement.setId(loginInfoExpectedList.size() + 1);
 
         viewModel.deleteLoginInfo(unExistingElement);
