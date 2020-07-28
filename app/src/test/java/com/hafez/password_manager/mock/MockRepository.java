@@ -3,6 +3,7 @@ package com.hafez.password_manager.mock;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import com.hafez.password_manager.models.Category;
 import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import java.util.ArrayList;
@@ -66,5 +67,20 @@ public class MockRepository implements LoginInfoRepository {
             }
         }
         return loginInfoLiveData;
+    }
+
+    @Override
+    public void insertCategory(Category category) {
+
+    }
+
+    @Override
+    public void updateCategory(Category category) {
+
+    }
+
+    @Override
+    public void deleteCategory(Category category) {
+
     }
 }

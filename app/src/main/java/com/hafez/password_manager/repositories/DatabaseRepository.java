@@ -5,6 +5,7 @@ import com.hafez.password_manager.App;
 import com.hafez.password_manager.database.AppDatabase;
 import com.hafez.password_manager.database.LoginInfoDao;
 import com.hafez.password_manager.models.LoginInfoFull;
+import com.hafez.password_manager.models.Category;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -50,6 +51,21 @@ public class DatabaseRepository implements LoginInfoRepository {
     @Override
     public LiveData<LoginInfoFull> getLoginInfo(long id) {
         return dao.getLoginInfo(id);
+    }
+
+    @Override
+    public void insertCategory(Category category) {
+        databaseExecutor.execute(() -> dao.insertCategory(category));
+    }
+
+    @Override
+    public void updateCategory(Category category) {
+        databaseExecutor.execute(() -> dao.updateCategory(category));
+    }
+
+    @Override
+    public void deleteCategory(Category category) {
+        databaseExecutor.execute(() -> dao.deleteCategory(category));
     }
 
 }

@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.room.Embedded;
 import androidx.room.Ignore;
+import com.hafez.password_manager.R;
 import java.util.Objects;
 
 public class LoginInfoFull {
@@ -26,7 +27,7 @@ public class LoginInfoFull {
     @Ignore
     public LoginInfoFull(long id, @NonNull String username, @NonNull String password,
             @DrawableRes int iconResourceId, long lastEditTime) {
-        this.loginInfo = new LoginInfo(id, username, password, iconResourceId, lastEditTime);
+        this.loginInfo = new LoginInfo(id, username, password, null, lastEditTime);
     }
 
     public LoginInfoFull(LoginInfo loginInfo) {
@@ -51,11 +52,10 @@ public class LoginInfoFull {
 
     @DrawableRes
     public int getIconResourceId() {
-        return loginInfo.iconResourceId;
+        return R.drawable.ic_launcher;
     }
 
     public void setIconResourceId(@DrawableRes int iconResourceId) {
-        this.loginInfo.iconResourceId = iconResourceId;
     }
 
     @NonNull

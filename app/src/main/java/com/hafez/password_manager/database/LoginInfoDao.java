@@ -7,6 +7,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+import com.hafez.password_manager.models.Category;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.models.LoginInfoFull;
 import java.util.List;
@@ -32,4 +33,13 @@ public abstract class LoginInfoDao {
     @Query("SELECT * FROM LoginInfo WHERE id = :id")
     public abstract LiveData<LoginInfoFull> getLoginInfo(long id);
 
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void insertCategory(Category category);
+
+    @Update
+    public abstract void updateCategory(Category category);
+
+    @Delete
+    public abstract void deleteCategory(Category category);
 }

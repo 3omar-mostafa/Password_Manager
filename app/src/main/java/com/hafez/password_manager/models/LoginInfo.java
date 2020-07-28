@@ -1,14 +1,21 @@
 package com.hafez.password_manager.models;
 
+import static androidx.room.ForeignKey.CASCADE;
+import static androidx.room.ForeignKey.SET_NULL;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import java.util.Calendar;
 import java.util.Objects;
 
-@Entity
+@Entity(foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "name",
+        childColumns = "categoryName", onUpdate = CASCADE, onDelete = SET_NULL))
 public class LoginInfo {
 
     public static final long INVALID_ID = 0;
@@ -16,8 +23,9 @@ public class LoginInfo {
     @PrimaryKey(autoGenerate = true)
     long id = INVALID_ID;
 
-    @DrawableRes
-    int iconResourceId;
+    @Nullable
+    @ColumnInfo(collate = ColumnInfo.NOCASE)
+    String categoryName;
 
     @NonNull
     String username;
@@ -35,7 +43,6 @@ public class LoginInfo {
             @DrawableRes int iconResourceId) {
         this.username = username;
         this.password = password;
-        this.iconResourceId = iconResourceId;
         this.lastEditTime = Calendar.getInstance().getTimeInMillis();
     }
 
@@ -47,9 +54,8 @@ public class LoginInfo {
     }
 
     public LoginInfo(long id, @NonNull String username, @NonNull String password,
-            @DrawableRes int iconResourceId, long lastEditTime) {
-        this(username, password, iconResourceId);
-        this.id = id;
+            @NonNull String categoryName, long lastEditTime) {
+        this(id ,username, password, 0);
         this.lastEditTime = lastEditTime;
     }
 
@@ -61,13 +67,13 @@ public class LoginInfo {
         this.id = id;
     }
 
-    @DrawableRes
-    public int getIconResourceId() {
-        return iconResourceId;
+    @Nullable
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setIconResourceId(@DrawableRes int iconResourceId) {
-        this.iconResourceId = iconResourceId;
+    public void setCategoryName(@Nullable String categoryName) {
+        this.categoryName = categoryName;
     }
 
     @NonNull
@@ -106,7 +112,7 @@ public class LoginInfo {
         }
         LoginInfo loginInfo = (LoginInfo) obj;
         return id == loginInfo.id &&
-                iconResourceId == loginInfo.iconResourceId &&
+                Objects.equals(categoryName, loginInfo.categoryName) &&
                 Objects.equals(username, loginInfo.username) &&
                 Objects.equals(password, loginInfo.password);
     }

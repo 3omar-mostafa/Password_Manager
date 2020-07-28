@@ -4,10 +4,11 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import com.hafez.password_manager.App;
+import com.hafez.password_manager.models.Category;
 import com.hafez.password_manager.models.LoginInfo;
 
 
-@Database(entities = LoginInfo.class, version = 1, exportSchema = false)
+@Database(entities = {LoginInfo.class, Category.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;

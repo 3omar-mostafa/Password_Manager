@@ -1,6 +1,7 @@
 package com.hafez.password_manager.repositories;
 
 import androidx.lifecycle.LiveData;
+import com.hafez.password_manager.models.Category;
 import com.hafez.password_manager.models.LoginInfoFull;
 import java.util.List;
 
@@ -17,4 +18,11 @@ public interface LoginInfoRepository {
     LiveData<List<LoginInfoFull>> getAllLoginInfoList();
 
     LiveData<LoginInfoFull> getLoginInfo(long id);
+
+    void insertCategory(Category category);
+
+    void updateCategory(Category category);
+
+    void deleteCategory(Category category);
+
 }
