@@ -10,7 +10,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.room.OnConflictStrategy;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import com.hafez.password_manager.R;
 import com.hafez.password_manager.LiveDataUtils;
 import com.hafez.password_manager.RetryFailedTestsRule;
 import com.hafez.password_manager.models.LoginInfoFull;
@@ -42,8 +41,8 @@ public class DatabaseTest {
         database = DatabaseTestUtils.getInMemoryDatabase();
         dao = database.getLoginInfoDao();
 
-        sampleData.add(new LoginInfoFull(1, "u_1", "p_1", R.drawable.ic_launcher));
-        sampleData.add(new LoginInfoFull(2, "u_2", "p_2", R.drawable.ic_launcher));
+        sampleData.add(new LoginInfoFull(1, "u_1", "p_1"));
+        sampleData.add(new LoginInfoFull(2, "u_2", "p_2"));
 
         for (LoginInfoFull loginInfo : sampleData) {
             dao.insert(loginInfo);

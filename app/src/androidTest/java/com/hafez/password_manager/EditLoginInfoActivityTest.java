@@ -92,7 +92,7 @@ public class EditLoginInfoActivityTest {
     public void init() {
         context = ApplicationProvider.getApplicationContext();
 
-        initialLoginInfo = new LoginInfoFull(1, "old_username", "old_password", 0);
+        initialLoginInfo = new LoginInfoFull(1, "old_username", "old_password");
 
         LoginInfoDao loginInfoDao = DatabaseTestUtils.getInMemoryDatabase().getLoginInfoDao();
         repository = new DatabaseRepository(loginInfoDao);

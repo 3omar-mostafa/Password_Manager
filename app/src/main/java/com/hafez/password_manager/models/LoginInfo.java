@@ -46,17 +46,10 @@ public class LoginInfo {
         this.lastEditTime = Calendar.getInstance().getTimeInMillis();
     }
 
-    @Ignore
     public LoginInfo(long id, @NonNull String username, @NonNull String password,
             @Nullable String categoryName) {
         this(username, password, categoryName);
         this.id = id;
-    }
-
-    public LoginInfo(long id, @NonNull String username, @NonNull String password,
-            @Nullable String categoryName, long lastEditTime) {
-        this(id ,username, password, categoryName);
-        this.lastEditTime = lastEditTime;
     }
 
     public long getId() {

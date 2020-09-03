@@ -36,28 +36,13 @@ public class LoginInfoFull {
     @Ignore
     public LoginInfoFull(long id, @NonNull String username, @NonNull String password,
             @Nullable Category category) {
-        this.category = category;
-        String categoryName = (category != null) ? category.getName() : null;
-        this.loginInfo = new LoginInfo(id, username, password, categoryName);
+        this(username,password,category);
+        this.loginInfo.id = id;
     }
 
     @Ignore
     public LoginInfoFull(long id, @NonNull String username, @NonNull String password) {
         this(id, username, password, null);
-    }
-
-    @Ignore
-    public LoginInfoFull(long id, @NonNull String username, @NonNull String password,
-            @Nullable Category category, long lastEditTime) {
-        this.category = category;
-        String categoryName = (category != null) ? category.getName() : null;
-        this.loginInfo = new LoginInfo(id, username, password, categoryName, lastEditTime);
-    }
-
-    @Ignore
-    public LoginInfoFull(long id, @NonNull String username, @NonNull String password,
-            long lastEditTime) {
-        this(id, username, password, null, lastEditTime);
     }
 
     @Ignore
