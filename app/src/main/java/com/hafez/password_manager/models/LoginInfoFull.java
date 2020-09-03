@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.room.Embedded;
 import androidx.room.Ignore;
 import androidx.room.Relation;
+import com.hafez.password_manager.Converters;
 import java.util.Objects;
 
 public class LoginInfoFull {
@@ -15,6 +16,7 @@ public class LoginInfoFull {
     private LoginInfo loginInfo;
 
     @Relation(parentColumn = "categoryName", entityColumn = "name")
+    @Nullable
     private Category category;
 
     @Ignore
@@ -112,34 +114,42 @@ public class LoginInfoFull {
     }
 
 
+    @Nullable
     public Category getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(@NonNull Category category) {
         this.category = category;
     }
 
-    @Nullable
+    @NonNull
     public String getCategoryName() {
-        return (category != null) ? category.name : null;
+        return (category != null) ? category.name : Category.NO_CATEGORY;
     }
 
     public void setCategoryName(@NonNull String categoryName) {
-        this.category.name = categoryName;
+        if (this.category != null) {
+            this.category.name = categoryName;
+        }
     }
 
     @NonNull
     public Bitmap getIcon() {
-        return category.icon;
+        return (category != null) ? category.icon
+                : Converters.drawableToBitmap(Category.NO_CATEGORY_ICON);
     }
 
     public void setIcon(@DrawableRes int iconResourceId) {
-        this.category.setIcon(iconResourceId);
+        if (this.category != null) {
+            this.category.setIcon(iconResourceId);
+        }
     }
 
     public void setIcon(@NonNull Bitmap icon) {
-        this.category.icon = icon;
+        if (this.category != null) {
+            this.category.icon = icon;
+        }
     }
 
     @Override

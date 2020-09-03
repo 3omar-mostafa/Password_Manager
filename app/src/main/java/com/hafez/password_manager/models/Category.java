@@ -7,11 +7,19 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import com.hafez.password_manager.App;
 import com.hafez.password_manager.Converters;
+import com.hafez.password_manager.R;
 import java.util.Objects;
 
 @Entity
 public class Category {
+
+    public static final String NO_CATEGORY = App.getInstance().getString(R.string.no_category);
+
+    @DrawableRes
+    public static final int NO_CATEGORY_ICON = R.drawable.ic_launcher;
+
 
     @NonNull
     @PrimaryKey

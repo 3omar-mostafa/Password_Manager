@@ -12,4 +12,5 @@
     <string name="unsaved_changes">You have unsaved changes</string>
     <string name="save">Save</string>
     <string name="discard">Discard</string>
+    <string name="no_category">No Category</string>
 </resources>
