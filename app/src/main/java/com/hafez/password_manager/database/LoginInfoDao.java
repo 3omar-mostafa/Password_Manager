@@ -1,5 +1,6 @@
 package com.hafez.password_manager.database;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -18,25 +19,19 @@ public abstract class LoginInfoDao {
 
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insert(LoginInfoFull loginInfo) {
-        if (loginInfo.getCategory() != null) {
-            insertCategory(loginInfo.getCategory());
-        }
+    public void insert(@NonNull LoginInfoFull loginInfo) {
         insert(loginInfo.getLoginInfo());
     }
 
     @Transaction
     @Update
-    public void update(LoginInfoFull loginInfo) {
-        if (loginInfo.getCategory() != null) {
-            updateCategory(loginInfo.getCategory());
-        }
+    public void update(@NonNull LoginInfoFull loginInfo) {
         update(loginInfo.getLoginInfo());
     }
 
     @Transaction
     @Delete
-    public void delete(LoginInfoFull loginInfo) {
+    public void delete(@NonNull LoginInfoFull loginInfo) {
         delete(loginInfo.getLoginInfo());
     }
 
