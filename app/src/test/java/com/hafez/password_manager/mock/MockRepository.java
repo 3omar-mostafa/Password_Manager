@@ -193,7 +193,7 @@ public class MockRepository implements LoginInfoRepository {
     }
 
     @Override
-    public LiveData<List<Category>> gelAllCategories() {
+    public LiveData<List<Category>> getAllCategories() {
         return categoryTable;
     }
 

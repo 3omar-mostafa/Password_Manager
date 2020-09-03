@@ -25,6 +25,6 @@ public interface LoginInfoRepository {
 
     void deleteCategory(Category category);
 
-    LiveData<List<Category>> gelAllCategories();
+    LiveData<List<Category>> getAllCategories();
 
 }

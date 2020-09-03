@@ -69,7 +69,7 @@ public class DatabaseRepository implements LoginInfoRepository {
     }
 
     @Override
-    public LiveData<List<Category>> gelAllCategories() {
+    public LiveData<List<Category>> getAllCategories() {
         return dao.getCategoryList();
     }
 
