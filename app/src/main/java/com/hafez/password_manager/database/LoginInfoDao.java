@@ -70,7 +70,7 @@ public abstract class LoginInfoDao {
     @Delete
     public abstract void deleteCategory(Category category);
 
-    @Query("SELECT * FROM Category")
+    @Query("SELECT * FROM Category ORDER BY name")
     public abstract LiveData<List<Category>> getCategoryList();
 
 }
