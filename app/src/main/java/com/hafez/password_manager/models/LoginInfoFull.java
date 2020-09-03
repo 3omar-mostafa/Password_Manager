@@ -1,12 +1,12 @@
 package com.hafez.password_manager.models;
 
+import android.graphics.Bitmap;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Embedded;
 import androidx.room.Ignore;
 import androidx.room.Relation;
-import com.hafez.password_manager.R;
 import java.util.Objects;
 
 public class LoginInfoFull {
@@ -129,13 +129,17 @@ public class LoginInfoFull {
         this.category.name = categoryName;
     }
 
-    @DrawableRes
-    public int getIconResourceId() {
-        return (category != null) ? category.iconResourceId : R.drawable.ic_launcher;
+    @NonNull
+    public Bitmap getIcon() {
+        return category.icon;
     }
 
-    public void setIconResourceId(@DrawableRes int iconResourceId) {
-        this.category.iconResourceId = iconResourceId;
+    public void setIcon(@DrawableRes int iconResourceId) {
+        this.category.setIcon(iconResourceId);
+    }
+
+    public void setIcon(@NonNull Bitmap icon) {
+        this.category.icon = icon;
     }
 
     @Override

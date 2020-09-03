@@ -1,10 +1,13 @@
 package com.hafez.password_manager.models;
 
+import android.graphics.Bitmap;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import com.hafez.password_manager.Converters;
 import java.util.Objects;
 
 @Entity
@@ -15,13 +18,21 @@ public class Category {
     @ColumnInfo(collate = ColumnInfo.NOCASE)
     String name;
 
-    @DrawableRes
-    int iconResourceId;
+    @NonNull
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    Bitmap icon;
 
-    public Category(@NonNull String name, @DrawableRes int iconResourceId) {
+    public Category(@NonNull String name, @NonNull Bitmap icon) {
         this.name = name;
-        this.iconResourceId = iconResourceId;
+        this.icon = icon;
     }
+
+    @Ignore
+    public Category(@NonNull String name, @DrawableRes int icon) {
+        this.name = name;
+        setIcon(icon);
+    }
+
 
     @NonNull
     public String getName() {
@@ -32,13 +43,17 @@ public class Category {
         this.name = name;
     }
 
-    @DrawableRes
-    public int getIconResourceId() {
-        return iconResourceId;
+    @NonNull
+    public Bitmap getIcon() {
+        return icon;
     }
 
-    public void setIconResourceId(@DrawableRes int iconResourceId) {
-        this.iconResourceId = iconResourceId;
+    public void setIcon(@NonNull Bitmap icon) {
+        this.icon = icon;
+    }
+
+    public void setIcon(@DrawableRes int icon) {
+        this.icon = Converters.drawableToBitmap(icon);
     }
 
     @Override
@@ -50,8 +65,7 @@ public class Category {
             return false;
         }
         Category category = (Category) obj;
-        return iconResourceId == category.iconResourceId &&
-                Objects.equals(name, category.name);
+        return Objects.equals(name, category.name);
     }
 
 }

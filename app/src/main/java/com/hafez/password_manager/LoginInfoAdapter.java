@@ -70,7 +70,7 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfoFull, LoginInfoViewHo
         }
 
         void bind(@NonNull LoginInfoFull loginInfo) {
-            viewBinding.icon.setImageResource(loginInfo.getIconResourceId());
+            viewBinding.icon.setImageBitmap(loginInfo.getIcon());
             viewBinding.username.setText(loginInfo.getUsername());
             viewBinding.password.setText(loginInfo.getPassword());
         }
