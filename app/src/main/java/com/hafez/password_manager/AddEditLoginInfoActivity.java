@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewParent;
 import android.widget.EditText;
+import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -18,11 +19,14 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hafez.password_manager.databinding.ActivityAddEditLoginInfoBinding;
+import com.hafez.password_manager.models.Category;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 
 public class AddEditLoginInfoActivity extends AppCompatActivity {
@@ -58,6 +62,8 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
                 loginInfoData.observe(this, loginInfo -> bindViewsWithData(loginInfo));
             }
         }
+
+        initializeCategories();
 
         initializeViews();
 
@@ -116,6 +122,22 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
 
     }
 
+
+    protected void initializeCategories() {
+        // TODO : Use Real Data from Database
+        List<Category> categories = new ArrayList<>();
+        categories.add(new Category("Category 1", R.drawable.ic_launcher));
+        categories.add(new Category("Category 2", R.drawable.ic_launcher));
+        categories.add(new Category("Category 3", R.drawable.ic_launcher));
+
+        CategorySpinnerAdapter adapter = new CategorySpinnerAdapter(this, categories);
+
+        adapter.setHint(new Category(getString(R.string.category), R.drawable.icon_category));
+
+        viewBinding.categoryDropdownList.setAdapter(adapter);
+        viewBinding.categoryDropdownList.setSelection(adapter.getHintPosition());
+    }
+
     protected boolean isInputValid() {
         return isValidTextInput(viewBinding.username) && isValidTextInput(viewBinding.password);
     }
@@ -156,8 +178,21 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         String username = viewBinding.username.getText().toString();
         String password = viewBinding.password.getText().toString();
 
-        LoginInfoFull loginInfo = new LoginInfoFull(username, password);
+        Category category = null;
+        if (isAnyCategorySelected()) {
+            category = (Category) viewBinding.categoryDropdownList.getSelectedItem();
+        }
+
+        LoginInfoFull loginInfo = new LoginInfoFull(username, password, category);
         viewModel.insertOrUpdateLoginInfo(loginInfo);
+    }
+
+    protected boolean isAnyCategorySelected() {
+        Spinner categoryDropdownList = viewBinding.categoryDropdownList;
+        int selectedPosition = categoryDropdownList.getSelectedItemPosition();
+        CategorySpinnerAdapter adapter = (CategorySpinnerAdapter) categoryDropdownList.getAdapter();
+
+        return selectedPosition != adapter.getHintPosition();
     }
 
     protected static boolean isValidTextInput(@NonNull EditText editText) {

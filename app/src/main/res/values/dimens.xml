@@ -7,4 +7,5 @@
     <dimen name="copy_icon">32dp</dimen>
     <dimen name="fab_size">56dp</dimen>
     <dimen name="recycler_view_fab_padding">72dp</dimen>
+    <dimen name="spinner_height">64dp</dimen>
 </resources>
