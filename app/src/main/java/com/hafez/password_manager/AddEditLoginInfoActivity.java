@@ -24,7 +24,6 @@ import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -59,7 +58,10 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
         if (mode == Modes.EDIT) {
             setTitle(R.string.edit_login_info);
             if (loginInfoData != null) {
-                loginInfoData.observe(this, loginInfo -> bindViewsWithData(loginInfo));
+                loginInfoData.observe(this, loginInfo -> {
+                    bindViewsWithData(loginInfo);
+                    updateEditModePreselectedCategory();
+                });
             }
         }
 
@@ -124,18 +126,27 @@ public class AddEditLoginInfoActivity extends AppCompatActivity {
 
 
     protected void initializeCategories() {
-        // TODO : Use Real Data from Database
-        List<Category> categories = new ArrayList<>();
-        categories.add(new Category("Category 1", R.drawable.ic_launcher));
-        categories.add(new Category("Category 2", R.drawable.ic_launcher));
-        categories.add(new Category("Category 3", R.drawable.ic_launcher));
 
-        CategorySpinnerAdapter adapter = new CategorySpinnerAdapter(this, categories);
+        viewModel.getAllCategories().observe(this, categories -> {
+            CategorySpinnerAdapter adapter = new CategorySpinnerAdapter(this, categories);
 
-        adapter.setHint(new Category(getString(R.string.category), R.drawable.icon_category));
+            adapter.setHint(new Category(getString(R.string.category), R.drawable.icon_category));
 
-        viewBinding.categoryDropdownList.setAdapter(adapter);
-        viewBinding.categoryDropdownList.setSelection(adapter.getHintPosition());
+            viewBinding.categoryDropdownList.setAdapter(adapter);
+            viewBinding.categoryDropdownList.setSelection(adapter.getHintPosition());
+            updateEditModePreselectedCategory();
+        });
+    }
+
+    protected void updateEditModePreselectedCategory() {
+        if (mode == Modes.EDIT) {
+            LoginInfoFull loginInfo = viewModel.getLoginInfo().getValue();
+            List<Category> categories = viewModel.getAllCategories().getValue();
+            if (loginInfo != null && loginInfo.getCategory() != null && categories != null) {
+                int index = categories.indexOf(loginInfo.getCategory());
+                viewBinding.categoryDropdownList.setSelection(index);
+            }
+        }
     }
 
     protected boolean isInputValid() {

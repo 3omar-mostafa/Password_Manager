@@ -5,16 +5,19 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import com.hafez.password_manager.models.Category;
 import com.hafez.password_manager.models.LoginInfo;
 import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
+import java.util.List;
 
 public class AddEditLoginInfoViewModel extends ViewModel {
 
     private LiveData<LoginInfoFull> loginInfo;
     private LoginInfoRepository repository;
     private long loginInfoId;
+    private LiveData<List<Category>> categories;
 
     /**
      * Used when updating existing {@link LoginInfoFull}
@@ -25,6 +28,7 @@ public class AddEditLoginInfoViewModel extends ViewModel {
         this.repository = repository;
         this.loginInfoId = loginInfoId;
         this.loginInfo = repository.getLoginInfo(this.loginInfoId);
+        this.categories = repository.getAllCategories();
     }
 
     /**
@@ -34,6 +38,7 @@ public class AddEditLoginInfoViewModel extends ViewModel {
         this.repository = repository;
         this.loginInfoId = LoginInfo.INVALID_ID;
         this.loginInfo = null;
+        this.categories = repository.getAllCategories();
     }
 
 
@@ -64,6 +69,10 @@ public class AddEditLoginInfoViewModel extends ViewModel {
     @Nullable
     public LiveData<LoginInfoFull> getLoginInfo() {
         return loginInfo;
+    }
+
+    public LiveData<List<Category>> getAllCategories() {
+        return categories;
     }
 
     public static class Factory implements ViewModelProvider.Factory {
