@@ -18,7 +18,7 @@ public class Category {
     public static final String NO_CATEGORY = App.getInstance().getString(R.string.no_category);
 
     @DrawableRes
-    public static final int NO_CATEGORY_ICON = R.drawable.ic_launcher;
+    public static final int NO_CATEGORY_ICON = R.drawable.no_category;
 
 
     @NonNull
