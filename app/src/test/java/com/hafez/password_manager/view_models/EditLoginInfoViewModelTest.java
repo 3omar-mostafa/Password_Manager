@@ -51,9 +51,9 @@ public class EditLoginInfoViewModelTest {
 
         loginInfoExpectedList = new ArrayList<>();
 
-        loginInfoExpectedList.add(new LoginInfoFull(1, "user_1", "pass_1", R.drawable.ic_launcher));
-        loginInfoExpectedList.add(new LoginInfoFull(2, "user_2", "pass_2", R.drawable.ic_launcher));
-        loginInfoExpectedList.add(new LoginInfoFull(3, "user_2", "pass_3", R.drawable.ic_launcher));
+        loginInfoExpectedList.add(new LoginInfoFull(1, "user_1", "pass_1"));
+        loginInfoExpectedList.add(new LoginInfoFull(2, "user_2", "pass_2"));
+        loginInfoExpectedList.add(new LoginInfoFull(3, "user_2", "pass_3"));
 
         return new MockRepository(loginInfoExpectedList);
     }
