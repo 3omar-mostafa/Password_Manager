@@ -8,16 +8,20 @@ import static org.junit.Assert.assertEquals;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
+import com.hafez.password_manager.EditLoginInfoActivityBackOrUpParameterizedTest.PressBackOrUp;
 import com.hafez.password_manager.Utils.CustomViewMatchers;
 import com.hafez.password_manager.database.DatabaseTestUtils;
 import com.hafez.password_manager.database.LoginInfoDao;
@@ -26,17 +30,20 @@ import com.hafez.password_manager.repositories.DatabaseRepository;
 import com.hafez.password_manager.repositories.LoginInfoRepository;
 import com.hafez.password_manager.view_models.AddEditLoginInfoViewModel;
 import java.util.List;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * The {@link AddEditLoginInfoActivity} Class Test is separated into three test classes, class for
- * general functions in {@link AddEditLoginInfoActivityTest} , class for Add part which is this
- * class, i.e. {@link AddLoginInfoActivityTest} , and class for Edit part in {@link
- * EditLoginInfoActivityTest}.
+ * This class test pressing up or back button in {@link AddLoginInfoActivityTest}
  */
-public class AddLoginInfoActivityTest {
+@RunWith(Parameterized.class)
+public class AddLoginInfoActivityBackOrUpParameterizedTest {
 
     @Rule(order = Integer.MIN_VALUE)
     public RetryFailedTestsRule retryFailedTestsRule = new RetryFailedTestsRule(5);
@@ -85,12 +92,30 @@ public class AddLoginInfoActivityTest {
     private static final String sampleUsername = "sample_username";
     private static final String samplePassword = "sample_password";
 
+    private static final int DIALOG_SAVE_BUTTON = android.R.id.button1;
+    private static final int DIALOG_DISCARD_BUTTON = android.R.id.button2;
+
+    interface PressBackOrUp {
+
+        void press();
+    }
+
+    @Parameter
+    public PressBackOrUp pressBackOrUp;
+
+    @Parameters
+    public static PressBackOrUp[] data() {
+        return new PressBackOrUp[]{
+                Espresso::pressBackUnconditionally, // Press Back
+                () -> onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                        .perform(ViewActions.click()) // Press Up
+        };
+    }
+
     @Before
     public void init() {
         context = ApplicationProvider.getApplicationContext();
-
         activity = activityRule.getActivity();
-
     }
 
     @NonNull
@@ -100,36 +125,114 @@ public class AddLoginInfoActivityTest {
         return new AddEditLoginInfoViewModel(repository);
     }
 
+    private void pressBackAndCheckDialogIsDisplayedAndClick(@IdRes int button) {
+        Espresso.closeSoftKeyboard();
+
+        pressBackOrUp.press();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes)).inRoot(RootMatchers.isDialog())
+                .check(matches(ViewMatchers.isDisplayed()));
+
+        onView(ViewMatchers.withId(button)).inRoot(RootMatchers.isDialog())
+                .perform(ViewActions.click());
+    }
 
     @Test
-    public void initialTest() {
-
-        String title = context.getString(R.string.add_login_info);
-
-        assertEquals(title, activity.getTitle());
-
+    public void pressBackOrUpAddedUsername_Save_Test() {
         onView(ViewMatchers.withId(R.id.username))
-                .check(matches(ViewMatchers.withText("")));
+                .perform(ViewActions.typeText(sampleUsername));
 
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToInsert_InvalidPassword();
+    }
+
+    @Test
+    public void pressBackOrUpAddedUsername_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    @Test
+    public void pressBackOrUpAddedPassword_Save_Test() {
         onView(ViewMatchers.withId(R.id.password))
-                .check(matches(ViewMatchers.withText("")));
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToInsert_InvalidUsername();
+    }
+
+    @Test
+    public void pressBackOrUpAddedPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
     }
 
 
     @Test
-    public void successfulInsertionTest() {
-
+    public void pressBackOrUpAddedUsernameAndPassword_Save_Test() {
         onView(ViewMatchers.withId(R.id.username))
                 .perform(ViewActions.typeText(sampleUsername));
 
         onView(ViewMatchers.withId(R.id.password))
                 .perform(ViewActions.typeText(samplePassword));
 
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
 
         checkValidInsertionToDatabase();
     }
+
+    @Test
+    public void pressBackOrUpAddedUsernameAndPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername));
+
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.typeText(samplePassword));
+
+        pressBackAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
+    }
+
+    @Test
+    public void pressBackOrUpNoChanges_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText(sampleUsername))
+                .perform(ViewActions.clearText());
+
+        Espresso.closeSoftKeyboard();
+
+        pressBackOrUp.press();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+    }
+
+
+    @Test
+    public void pressBackOrUpAddedWhitespaces_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.typeText("  "));
+
+        Espresso.closeSoftKeyboard();
+
+        pressBackOrUp.press();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+
+    }
+
 
     private void checkValidInsertionToDatabase() {
         onView(ViewMatchers.withId(R.id.username))
@@ -152,44 +255,6 @@ public class AddLoginInfoActivityTest {
         assertEquals(samplePassword, loginInfo.getPassword());
     }
 
-
-    @Test
-    public void failedInsertionInvalidInputTest() {
-        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
-
-        onView(ViewMatchers.withId(R.id.save)).perform(ViewActions.click());
-
-        String error = context.getString(R.string.error_text);
-
-        onView(ViewMatchers.withId(R.id.username))
-                .check(matches(CustomViewMatchers.parentHasErrorText(error)));
-
-        onView(ViewMatchers.withId(R.id.password))
-                .check(matches(CustomViewMatchers.parentHasErrorText(error)));
-
-        onView(ViewMatchers.withId(com.google.android.material.R.id.snackbar_text))
-                .check(matches(ViewMatchers.isDisplayed()))
-                .check(matches(ViewMatchers.withText(R.string.error_save_validation)));
-
-        assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
-
-        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
-    }
-
-
-    @Test
-    public void failedInsertionInvalidUsernameTest() {
-        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
-
-        onView(ViewMatchers.withId(R.id.password))
-                .perform(ViewActions.typeText(samplePassword));
-
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
-
-        checkFailedToInsert_InvalidUsername();
-    }
-
     private void checkFailedToInsert_InvalidUsername() {
         String error = context.getString(R.string.error_text);
         onView(ViewMatchers.withId(R.id.username))
@@ -205,20 +270,6 @@ public class AddLoginInfoActivityTest {
         assertEquals(State.RESUMED, activity.getLifecycle().getCurrentState());
 
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
-    }
-
-
-    @Test
-    public void failedInsertionInvalidPasswordTest() {
-        DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
-
-        onView(ViewMatchers.withId(R.id.username))
-                .perform(ViewActions.typeText(sampleUsername));
-
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
-
-        checkFailedToInsert_InvalidPassword();
     }
 
     private void checkFailedToInsert_InvalidPassword() {
@@ -237,6 +288,5 @@ public class AddLoginInfoActivityTest {
 
         DatabaseTestUtils.assertThatLoginInfoTableIsEmpty(repository);
     }
-
 
 }

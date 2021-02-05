@@ -8,11 +8,14 @@ import static org.junit.Assert.assertEquals;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import androidx.annotation.IdRes;
 import androidx.lifecycle.Lifecycle.State;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider.Factory;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.RootMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.intercepting.SingleActivityFactory;
@@ -28,14 +31,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
- * The {@link AddEditLoginInfoActivity} Class Test is separated into three test classes, class for
- * general functions in {@link AddEditLoginInfoActivityTest} , class for Add part in {@link
- * AddLoginInfoActivityTest} , and class for Edit part which is this class, i.e. {@link
- * EditLoginInfoActivityTest}.
+ * This class test pressing up or back button in {@link EditLoginInfoActivityTest}
  */
-public class EditLoginInfoActivityTest {
+@RunWith(Parameterized.class)
+public class EditLoginInfoActivityBackOrUpParameterizedTest {
 
     @Rule(order = Integer.MIN_VALUE)
     public RetryFailedTestsRule retryFailedTestsRule = new RetryFailedTestsRule(5);
@@ -82,6 +87,26 @@ public class EditLoginInfoActivityTest {
     private static final String newUsername = "new_username";
     private static final String newPassword = "new_password";
 
+    private static final int DIALOG_SAVE_BUTTON = android.R.id.button1;
+    private static final int DIALOG_DISCARD_BUTTON = android.R.id.button2;
+
+    interface PressBackOrUp {
+
+        void press();
+    }
+
+    @Parameter
+    public PressBackOrUp pressBackOrUp;
+
+    @Parameters
+    public static PressBackOrUp[] data() {
+        return new PressBackOrUp[]{
+                Espresso::pressBackUnconditionally, // Press Back
+                () -> onView(ViewMatchers.withContentDescription(R.string.abc_action_bar_up_description))
+                        .perform(ViewActions.click()) // Press Up
+        };
+    }
+
     @Before
     public void init() {
         context = ApplicationProvider.getApplicationContext();
@@ -95,7 +120,8 @@ public class EditLoginInfoActivityTest {
         initialDatabaseSize = getLoginInfoTableSize();
 
         Intent intent = new Intent(context, AddEditLoginInfoActivity.class);
-        intent.putExtra(AddEditLoginInfoActivity.ARGUMENT_LOGIN_INFO_ID, initialLoginInfo.getId());
+        intent.putExtra(AddEditLoginInfoActivity.ARGUMENT_LOGIN_INFO_ID,
+                initialLoginInfo.getId());
         activityRule.launchActivity(intent);
 
         activity = activityRule.getActivity();
@@ -114,61 +140,97 @@ public class EditLoginInfoActivityTest {
         assertEquals(initialDatabaseSize, currentLoginInfoTableSize);
     }
 
-    @Test
-    public void initialDataLoadedSuccessfullyTest() {
+    private void pressBackOrUpAndCheckDialogIsDisplayedAndClick(@IdRes int button) {
+        Espresso.closeSoftKeyboard();
 
-        String title = context.getString(R.string.edit_login_info);
+        pressBackOrUp.press();
 
-        assertEquals(title, activity.getTitle());
+        onView(ViewMatchers.withText(R.string.unsaved_changes)).inRoot(RootMatchers.isDialog())
+                .check(matches(ViewMatchers.isDisplayed()));
 
-        onView(ViewMatchers.withId(R.id.username))
-                .check(matches(ViewMatchers.withText(initialLoginInfo.getUsername())));
-
-        onView(ViewMatchers.withId(R.id.password))
-                .check(matches(ViewMatchers.withText(initialLoginInfo.getPassword())));
+        onView(ViewMatchers.withId(button)).inRoot(RootMatchers.isDialog())
+                .perform(ViewActions.click());
     }
 
 
     @Test
-    public void updateUsernameTest() {
-
+    public void pressBackOrUp_UpdatedUsername_Save_Test() {
         onView(ViewMatchers.withId(R.id.username))
                 .perform(ViewActions.replaceText(newUsername));
 
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
 
         assertNoErrors();
 
-        assertDatabaseEquals(initialLoginInfo.getId(), newUsername, initialLoginInfo.getPassword());
+        assertDatabaseEquals(initialLoginInfo.getId(), newUsername,
+                initialLoginInfo.getPassword());
+    }
+
+    @Test
+    public void pressBackOrUp_UpdatedUsername_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
+
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
     }
 
 
     @Test
-    public void updatePasswordTest() {
+    public void pressBackOrUp_DeletedUsername_Save_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.clearText());
 
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidUsername();
+    }
+
+    @Test
+    public void pressBackOrUp_UpdatedPassword_Save_Test() {
         onView(ViewMatchers.withId(R.id.password))
                 .perform(ViewActions.replaceText(newPassword));
 
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
 
         assertNoErrors();
 
         assertDatabaseEquals(initialLoginInfo.getId(), initialLoginInfo.getUsername(), newPassword);
     }
 
-    @Test
-    public void updateUsernameAndPasswordTest() {
 
+    @Test
+    public void pressBackOrUp_UpdatedPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
+
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
+
+        assertDatabaseNotChanged();
+    }
+
+
+    @Test
+    public void pressBackOrUp_DeletedPassword_Save_Test() {
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.clearText());
+
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
+
+        checkFailedToUpdate_InvalidPassword();
+    }
+
+
+    @Test
+    public void pressBackOrUp_UpdatedUsernameAndPassword_Save_Test() {
         onView(ViewMatchers.withId(R.id.username))
                 .perform(ViewActions.replaceText(newUsername));
 
         onView(ViewMatchers.withId(R.id.password))
                 .perform(ViewActions.replaceText(newPassword));
 
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
 
         assertNoErrors();
 
@@ -176,32 +238,46 @@ public class EditLoginInfoActivityTest {
     }
 
     @Test
-    public void saveWithNoChangesTest() {
+    public void pressBackOrUp_UpdatedUsernameAndPassword_Discard_Test() {
+        onView(ViewMatchers.withId(R.id.username))
+                .perform(ViewActions.replaceText(newUsername));
 
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
+        onView(ViewMatchers.withId(R.id.password))
+                .perform(ViewActions.replaceText(newPassword));
 
-        assertNoErrors();
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_DISCARD_BUTTON);
 
         assertDatabaseNotChanged();
     }
 
-    @Test
-    public void updateInvalidInputTest() {
 
+    @Test
+    public void pressBackOrUp_DeletedUsernameAndPassword_Save_Test() {
         onView(ViewMatchers.withId(R.id.username))
                 .perform(ViewActions.clearText());
 
         onView(ViewMatchers.withId(R.id.password))
                 .perform(ViewActions.clearText());
 
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
+        pressBackOrUpAndCheckDialogIsDisplayedAndClick(DIALOG_SAVE_BUTTON);
 
         checkFailedToUpdate_InvalidUsernameAndPassword();
     }
 
-    private void checkFailedToUpdate_InvalidUsernameAndPassword() {
+    @Test
+    public void pressBackOrUp_NoChanges_Test() {
+        Espresso.closeSoftKeyboard();
+
+        pressBackOrUp.press();
+
+        onView(ViewMatchers.withText(R.string.unsaved_changes))
+                .check(doesNotExist());
+
+        assertDatabaseNotChanged();
+    }
+
+
+    protected void checkFailedToUpdate_InvalidUsernameAndPassword() {
         String error = context.getString(R.string.error_text);
 
         onView(ViewMatchers.withId(R.id.username))
@@ -219,20 +295,7 @@ public class EditLoginInfoActivityTest {
         assertDatabaseNotChanged();
     }
 
-
-    @Test
-    public void updateInvalidUsernameTest() {
-
-        onView(ViewMatchers.withId(R.id.username))
-                .perform(ViewActions.clearText());
-
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
-
-        checkFailedToUpdate_InvalidUsername();
-    }
-
-    private void checkFailedToUpdate_InvalidUsername() {
+    protected void checkFailedToUpdate_InvalidUsername() {
         String error = context.getString(R.string.error_text);
         onView(ViewMatchers.withId(R.id.username))
                 .check(matches(CustomViewMatchers.parentHasErrorText(error)));
@@ -249,20 +312,7 @@ public class EditLoginInfoActivityTest {
         assertDatabaseNotChanged();
     }
 
-
-    @Test
-    public void updateInvalidPasswordTest() {
-
-        onView(ViewMatchers.withId(R.id.password))
-                .perform(ViewActions.clearText());
-
-        onView(ViewMatchers.withId(R.id.save))
-                .perform(ViewActions.click());
-
-        checkFailedToUpdate_InvalidPassword();
-    }
-
-    private void checkFailedToUpdate_InvalidPassword() {
+    protected void checkFailedToUpdate_InvalidPassword() {
         String error = context.getString(R.string.error_text);
         onView(ViewMatchers.withId(R.id.password))
                 .check(matches(CustomViewMatchers.parentHasErrorText(error)));
@@ -279,7 +329,7 @@ public class EditLoginInfoActivityTest {
         assertDatabaseNotChanged();
     }
 
-    private void assertNoErrors() {
+    protected void assertNoErrors() {
 
         onView(ViewMatchers.withId(R.id.username))
                 .check(matches(CustomViewMatchers.parentHasNoErrorText()));
@@ -291,8 +341,7 @@ public class EditLoginInfoActivityTest {
                 .check(doesNotExist());
     }
 
-
-    private void assertDatabaseNotChanged() {
+    protected void assertDatabaseNotChanged() {
         long currentLoginInfoTableSize = getLoginInfoTableSize();
 
         assertEquals(initialDatabaseSize, currentLoginInfoTableSize);
@@ -301,7 +350,7 @@ public class EditLoginInfoActivityTest {
                 initialLoginInfo.getPassword());
     }
 
-    private void assertDatabaseEquals(long id, String username, String password) {
+    protected void assertDatabaseEquals(long id, String username, String password) {
         InstantTaskExecutorUtils.turnOn();
 
         final int databaseSize = 1;
@@ -319,7 +368,7 @@ public class EditLoginInfoActivityTest {
         InstantTaskExecutorUtils.turnOff();
     }
 
-    private long getLoginInfoTableSize() {
+    protected long getLoginInfoTableSize() {
         InstantTaskExecutorUtils.turnOn();
         long size = DatabaseTestUtils.getLoginInfoTableSize(repository);
         InstantTaskExecutorUtils.turnOff();
