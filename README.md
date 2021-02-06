@@ -3,12 +3,14 @@ Simple Android Password Manager
 
 # Screenshots
 
-![Main Screen](screenshots/main.png)
-![Reorder](screenshots/reorder.gif)
-![Add](screenshots/add.png)
-![Edit](screenshots/edit.png)
-![Delete](screenshots/delete.png)
-![Undo Delete](screenshots/undo.png)
+Main Screen                |  Reorder Items            |   Add New Login Info
+:-------------------------:|:-------------------------:|:-------------------------:
+![](screenshots/main.png)  |  ![](screenshots/reorder.gif)| ![](screenshots/add.png)
+
+
+Add Login Info             |  Delete Item              |   Undo Delete
+:-------------------------:|:-------------------------:|:-------------------------:
+![](screenshots/edit.png)  |  ![](screenshots/delete.png)| ![](screenshots/undo.png)
 
 
 # Used Technologies
