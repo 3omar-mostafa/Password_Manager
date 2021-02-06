@@ -26,10 +26,12 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfoFull, LoginInfoViewHo
     };
 
     private OnItemClickListener onItemClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
 
     public LoginInfoAdapter() {
         super(DIFF_CALLBACK);
         onItemClickListener = null;
+        onItemLongClickListener = null;
     }
 
     @NonNull
@@ -53,6 +55,10 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfoFull, LoginInfoViewHo
         this.onItemClickListener = onItemClickListener;
     }
 
+    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
     class LoginInfoViewHolder extends ViewHolder {
 
         private LoginInfoListItemBinding viewBinding;
@@ -65,6 +71,14 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfoFull, LoginInfoViewHo
                 if (onItemClickListener != null) {
                     onItemClickListener.onItemClick(v, getItem(getLayoutPosition()));
                 }
+            });
+
+            viewBinding.getRoot().setOnLongClickListener(v -> {
+                if (onItemLongClickListener != null) {
+                    onItemLongClickListener.onItemLongClick(v, getItem(getLayoutPosition()));
+                    return true;
+                }
+                return false;
             });
 
         }
@@ -80,6 +94,11 @@ public class LoginInfoAdapter extends ListAdapter<LoginInfoFull, LoginInfoViewHo
     public interface OnItemClickListener {
 
         void onItemClick(View view, @NonNull LoginInfoFull loginInfo);
+    }
+
+    public interface OnItemLongClickListener {
+
+        void onItemLongClick(View view, @NonNull LoginInfoFull loginInfo);
     }
 
 }

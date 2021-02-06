@@ -29,4 +29,5 @@
     <string name="twitter">Twitter</string>
     <string name="ubuntu">Ubuntu</string>
     <string name="yahoo">Yahoo</string>
+    <string name="password_copied">Password Copied</string>
 </resources>

@@ -1,5 +1,8 @@
 package com.hafez.password_manager;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,6 +46,15 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, AddEditLoginInfoActivity.class);
             intent.putExtra(AddEditLoginInfoActivity.ARGUMENT_LOGIN_INFO_ID, loginInfo.getId());
             startActivity(intent);
+        });
+
+        adapter.setOnItemLongClickListener((view, loginInfo) -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) {
+                ClipData data = ClipData.newPlainText(null, loginInfo.getPassword());
+                clipboard.setPrimaryClip(data);
+                Toast.makeText(this, R.string.password_copied, Toast.LENGTH_SHORT).show();
+            }
         });
 
         viewBinding.add.setOnClickListener(v -> {
