@@ -154,6 +154,11 @@ public class MockRepository implements LoginInfoRepository {
     }
 
     @Override
+    public void reorderLoginInfoPositions(int startMovePosition, int endMovePosition) {
+        // TODO
+    }
+
+    @Override
     public void insertCategory(Category category) {
 
         if (doesCategoriesContains(category.getName())) {
