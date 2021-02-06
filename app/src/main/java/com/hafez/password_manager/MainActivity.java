@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +24,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.hafez.password_manager.databinding.ActivityMainBinding;
 import com.hafez.password_manager.models.LoginInfoFull;
 import com.hafez.password_manager.view_models.LoginInfoViewModel;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -84,9 +88,16 @@ public class MainActivity extends AppCompatActivity {
         LoginInfoViewModel viewModel;
         View snackbarAnchorView;
 
+        /**
+         * It is used to store where the movement started, The end is not stored because we can get
+         * it from {@link ViewHolder#getAdapterPosition()}
+         */
+        int startMovePosition = AdapterView.INVALID_POSITION;
+
         public ItemTouchHelperCallback(LoginInfoViewModel viewModel, View snackbarAnchorView,
                 LoginInfoAdapter adapter) {
-            super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+            super(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                    ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
             this.viewModel = viewModel;
             this.snackbarAnchorView = snackbarAnchorView;
             this.adapter = adapter;
@@ -96,7 +107,63 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull ViewHolder viewHolder,
                 @NonNull ViewHolder target) {
-            return false;
+
+            viewHolder.itemView.setElevation(25); // Draw shadow under the moving view
+
+            int oldPosition = viewHolder.getAdapterPosition();
+            int newPosition = target.getAdapterPosition();
+
+            if (startMovePosition == AdapterView.INVALID_POSITION) {
+                startMovePosition = oldPosition;
+            }
+
+            List<LoginInfoFull> loginInfoList = new ArrayList<>(adapter.getCurrentList());
+
+            reorderListPositions(loginInfoList, oldPosition, newPosition);
+
+            adapter.submitList(loginInfoList);
+
+            return true;
+        }
+
+
+        private static void swapLoginInfoIds(@NonNull LoginInfoFull loginInfo_1,
+                @NonNull LoginInfoFull loginInfo_2) {
+            long temp = loginInfo_1.getId();
+            loginInfo_1.setId(loginInfo_2.getId());
+            loginInfo_2.setId(temp);
+        }
+
+
+        private void reorderListPositions(List<LoginInfoFull> loginInfoList, int oldPosition,
+                int newPosition) {
+
+            if (oldPosition < newPosition) {
+                for (int i = oldPosition; i < newPosition; i++) {
+                    Collections.swap(loginInfoList, i, i + 1);
+                    // Reordering is done by replacing ids, smaller id is on the top
+                    swapLoginInfoIds(loginInfoList.get(i), loginInfoList.get(i + 1));
+                }
+            } else {
+                for (int i = oldPosition; i > newPosition; i--) {
+                    Collections.swap(loginInfoList, i, i - 1);
+                    // Reordering is done by replacing ids, smaller id is on the top
+                    swapLoginInfoIds(loginInfoList.get(i), loginInfoList.get(i - 1));
+                }
+            }
+        }
+
+
+        @Override
+        public void clearView(@NonNull RecyclerView recyclerView, @NonNull ViewHolder viewHolder) {
+            super.clearView(recyclerView, viewHolder);
+
+            int endMovePosition = viewHolder.getAdapterPosition();
+            if (startMovePosition != AdapterView.INVALID_POSITION) {
+                viewModel.reorderLoginInfoPositions(startMovePosition, endMovePosition);
+                startMovePosition = AdapterView.INVALID_POSITION;
+            }
+            viewHolder.itemView.setElevation(0);
         }
 
         @Override
@@ -127,11 +194,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (swipeDirection != 0) {
-                viewHolder.itemView.setElevation(25); // Draw shadow under the wiped view
+                viewHolder.itemView.setElevation(25); // Draw shadow under the swiped view
                 drawBackground(c, viewHolder.itemView);
                 drawDeleteIcon(c, viewHolder.itemView, swipeDirection);
-            } else { // view is unSwiped
-                viewHolder.itemView.setElevation(0);
             }
 
         }

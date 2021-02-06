@@ -54,6 +54,12 @@ public class DatabaseRepository implements LoginInfoRepository {
     }
 
     @Override
+    public void reorderLoginInfoPositions(int startMovePosition, int endMovePosition) {
+        databaseExecutor.execute(() ->
+                dao.reorderLoginInfoPositions(startMovePosition, endMovePosition));
+    }
+
+    @Override
     public void insertCategory(Category category) {
         databaseExecutor.execute(() -> dao.insertCategory(category));
     }

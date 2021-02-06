@@ -36,6 +36,9 @@ public class LoginInfoViewModel extends ViewModel {
         repository.deleteAllLoginInfo();
     }
 
+    public void reorderLoginInfoPositions(int startMovePosition, int endMovePosition) {
+        repository.reorderLoginInfoPositions(startMovePosition, endMovePosition);
+    }
 
     public static class Factory implements ViewModelProvider.Factory {
 

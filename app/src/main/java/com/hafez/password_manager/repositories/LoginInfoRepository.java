@@ -19,6 +19,8 @@ public interface LoginInfoRepository {
 
     LiveData<LoginInfoFull> getLoginInfo(long id);
 
+    void reorderLoginInfoPositions(int startMovePosition, int endMovePosition);
+
     void insertCategory(Category category);
 
     void updateCategory(Category category);
